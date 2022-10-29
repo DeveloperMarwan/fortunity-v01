@@ -1,6 +1,6 @@
 // deploy/00_deploy_your_contract.js
 
-const { ethers } = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
 
 const localChainId = "31337";
 
@@ -17,6 +17,18 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
 
+  const ClearingHouseConfig = await ethers.getContractFactory(
+    "ClearingHouseConfig"
+  );
+  const clearingHouseConfig = await upgrades.deployProxy(
+    ClearingHouseConfig,
+    [],
+    { gasLimit: 3e7 }
+  );
+  await clearingHouseConfig.deployed();
+  console.log("ClearingHouseConfig deployed to:", clearingHouseConfig.address);
+
+  /*
   await deploy("YourContract", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
@@ -24,9 +36,11 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     log: true,
     waitConfirmations: 5,
   });
+  */
 
   // Getting a previously deployed contract
-  const YourContract = await ethers.getContract("YourContract", deployer);
+  // const YourContract = await ethers.getContract("YourContract", deployer);
+
   /*  await YourContract.setPurpose("Hello");
   
     // To take ownership of yourContract using the ownable library uncomment next line and add the 
@@ -79,4 +93,4 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   //   console.error(error);
   // }
 };
-module.exports.tags = ["YourContract"];
+module.exports.tags = ["clearingHouseConfig"];

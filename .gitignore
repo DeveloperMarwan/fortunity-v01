@@ -66,3 +66,5 @@ yarn-error.log*
 
 # doc directory
 /doc
+packages/hardhat/typechain/*
+packages/hardhat/.openzeppelin/*

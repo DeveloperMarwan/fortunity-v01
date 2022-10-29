@@ -3,10 +3,11 @@ const { utils } = require("ethers");
 const fs = require("fs");
 const chalk = require("chalk");
 
-require("@nomicfoundation/hardhat-chai-matchers");
+// require("@nomicfoundation/hardhat-chai-matchers");
 require("@tenderly/hardhat-tenderly");
 require("@nomicfoundation/hardhat-toolbox");
 require("hardhat-deploy");
+require("@openzeppelin/hardhat-upgrades");
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 
@@ -257,7 +258,7 @@ module.exports = {
   solidity: {
     compilers: [
       {
-        version: "0.8.4",
+        version: "0.6.7",
         settings: {
           optimizer: {
             enabled: true,
@@ -266,7 +267,7 @@ module.exports = {
         },
       },
       {
-        version: "0.6.7",
+        version: "0.7.6",
         settings: {
           optimizer: {
             enabled: true,
