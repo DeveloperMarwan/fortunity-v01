@@ -1,6 +1,15 @@
 // deploy/00_deploy_your_contract.js
 
+// deploy the bytecode
+/*
 const { ethers, upgrades } = require("hardhat");
+const {
+  abi,
+  bytecode
+} = require("../artifacts/@uniswap/v3-core/contracts/UniswapV3Factory.sol/UniswapV3Factory.json");
+*/
+const { upgrades, ethers } = require("hardhat");
+const uniswapFactory = require("../artifacts/@uniswap/v3-core/contracts/UniswapV3Factory.sol/UniswapV3Factory.json");
 
 const localChainId = "31337";
 
@@ -17,6 +26,42 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
 
+  const USDC = await ethers.getContractFactory("TestERC20");
+  const usdc = await upgrades.deployProxy(USDC, ["TestUSDC", "USDC", 6], {
+    initializer: "__TestERC20_init",
+  });
+  await usdc.deployed();
+  console.log("USDC deployed to: ", usdc.address);
+  const usdcDecimals = await usdc.decimals();
+
+  const WETH = await ethers.getContractFactory("TestERC20");
+  const weth = await upgrades.deployProxy(WETH, ["TestWETH", "WETH", 18], {
+    initializer: "__TestERC20_init",
+  });
+  await weth.deployed();
+  console.log("WETH deployed to: ", weth.address);
+
+  const WBTC = await ethers.getContractFactory("TestERC20");
+  const wbtc = await upgrades.deployProxy(WBTC, ["TestWBTC", "WBTC", 8], {
+    initializer: "__TestERC20_init",
+  });
+  await wbtc.deployed();
+  console.log("WBTC deployed to: ", wbtc.address);
+
+  await deploy("UniswapV3Factory", {
+    from: deployer,
+    contract: {
+      abi: uniswapFactory.abi,
+      bytecode: uniswapFactory.bytecode,
+    },
+    log: true,
+  });
+  const uniswapFactoryContract = await ethers.getContract(
+    "UniswapV3Factory",
+    deployer
+  );
+  console.log("UniswapV3Factory deployed to:", uniswapFactoryContract.address);
+
   const ClearingHouseConfig = await ethers.getContractFactory(
     "ClearingHouseConfig"
   );
@@ -27,6 +72,101 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   );
   await clearingHouseConfig.deployed();
   console.log("ClearingHouseConfig deployed to:", clearingHouseConfig.address);
+
+  const QuoteToken = await ethers.getContractFactory("QuoteToken");
+  const quoteToken = await upgrades.deployProxy(QuoteToken, [
+    "Quote Token",
+    "FRTN",
+  ]);
+  await quoteToken.deployed();
+  console.log("QuoteToken deployed to:", quoteToken.address);
+
+  const MarketRegistry = await ethers.getContractFactory("MarketRegistry");
+  const marketRegistry = await upgrades.deployProxy(MarketRegistry, [
+    uniswapFactoryContract.address,
+    quoteToken.address,
+  ]);
+  await marketRegistry.deployed();
+  console.log("MarketRegistry deployed to:", marketRegistry.address);
+
+  const OrderBook = await ethers.getContractFactory("OrderBook");
+  const orderBook = await upgrades.deployProxy(OrderBook, [
+    marketRegistry.address,
+  ]);
+  await orderBook.deployed();
+  console.log("OrderBook deployed to: ", orderBook.address);
+
+  const AccountBalance = await ethers.getContractFactory("AccountBalance");
+  const accountBalance = await upgrades.deployProxy(AccountBalance, [
+    clearingHouseConfig.address,
+    orderBook.address,
+  ]);
+  await accountBalance.deployed();
+  console.log("AccountBalance deployed to: ", accountBalance.address);
+
+  const Exchange = await ethers.getContractFactory("Exchange");
+  const exchange = await upgrades.deployProxy(Exchange, [
+    marketRegistry.address,
+    orderBook.address,
+    clearingHouseConfig.address,
+  ]);
+  await exchange.deployed();
+  console.log("Exchange deployed to: ", exchange.address);
+  await exchange.setAccountBalance(accountBalance.address);
+  console.log(
+    "finished setting the account balance address on the exchange contract"
+  );
+  await orderBook.setExchange(exchange.address);
+  console.log("finished setting the exchange adress on the orderBook contract");
+
+  const InsuranceFund = await ethers.getContractFactory("InsuranceFund");
+  const insuranceFund = await upgrades.deployProxy(InsuranceFund, [
+    usdc.address,
+  ]);
+  await insuranceFund.deployed();
+  console.log("InsuranceFund deployed to: ", insuranceFund.address);
+
+  const Vault = await ethers.getContractFactory("Vault");
+  const vault = await upgrades.deployProxy(Vault, [
+    insuranceFund.address,
+    clearingHouseConfig.address,
+    accountBalance.address,
+    exchange.address,
+  ]);
+  await vault.deployed();
+  console.log("Vault deployed to: ", vault.address);
+
+  const CollateralManager = await ethers.getContractFactory("CollateralManager");
+  const collateralManager = await upgrades.deployProxy(CollateralManager, [
+    clearingHouseConfig.address,
+    vault.address,
+    5, // maxCollateralTokensPerAccount
+    750000,  // debtNonSettlementTokenValueRatio
+    500000,  // liquidationRatio
+    2000,    // mmRatioBuffer
+    30000,   // clInsuranceFundFeeRatio
+    10000e6, // parseUnits("10000", usdcDecimals), // debtThreshold
+    500e6,   // parseUnits("500", usdcDecimals), // collateralValueDust
+  ]);
+  await collateralManager.deployed();
+  console.log("CollateralManager deployed to: ", collateralManager.address);
+
+  // need to figure out the price feed mock contract
+  /*
+  await collateralManager.addCollateral(weth.address, {
+    priceFeed: mockedWethPriceFeed.address,
+    collateralRatio: (0.7e6).toString(),
+    discountRatio: (0.1e6).toString(),
+    depositCap: (1000e18).toString(),
+  });
+
+  await collateralManager.addCollateral(wbtc.address, {
+    priceFeed: mockedWbtcPriceFeed.address,
+    collateralRatio: (0.7e6).toString(),
+    discountRatio: (0.1e6).toString(),
+    depositCap: (1000e8).toString(), // parseUnits("1000", await WBTC.decimals()),
+  });
+  */
 
   /*
   await deploy("YourContract", {
