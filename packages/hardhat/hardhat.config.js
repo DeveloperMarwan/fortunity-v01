@@ -4,7 +4,7 @@ const fs = require("fs");
 const chalk = require("chalk");
 
 // require("@nomicfoundation/hardhat-chai-matchers");
-require("@tenderly/hardhat-tenderly");
+// require("@tenderly/hardhat-tenderly");
 require("@nomicfoundation/hardhat-toolbox");
 require("hardhat-deploy");
 require("@openzeppelin/hardhat-upgrades");

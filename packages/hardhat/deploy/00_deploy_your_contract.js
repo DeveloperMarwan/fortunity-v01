@@ -9,7 +9,9 @@ const {
 } = require("../artifacts/@uniswap/v3-core/contracts/UniswapV3Factory.sol/UniswapV3Factory.json");
 */
 const { upgrades, ethers } = require("hardhat");
+const { parseEther, parseUnits } = require("ethers/lib/utils");
 const uniswapFactory = require("../artifacts/@uniswap/v3-core/contracts/UniswapV3Factory.sol/UniswapV3Factory.json");
+
 
 const localChainId = "31337";
 
@@ -25,6 +27,45 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
+  const uniFeeTier = 10000; // 1%
+
+  const weth_priceFeedAddress = "0x7969c5eD335650692Bc04293B07F5BF2e7A673C0";
+  const wbtc_priceFeedAddress = "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650";
+  const base_token_priceFeedAddress =
+    "0xc351628EB244ec633d5f21fBD6621e1a683B1181";
+
+  const cacheTwapInterval = 15 * 60;
+
+  const QuoteToken = await ethers.getContractFactory("QuoteToken");
+  const quoteToken = await upgrades.deployProxy(QuoteToken, [
+    "Quote Token",
+    "FRTN",
+  ]);
+  await quoteToken.deployed();
+  console.log("QuoteToken deployed to:", quoteToken.address);
+
+  await deploy("ChainlinkPriceFeedV2", {
+    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
+    from: deployer,
+    args: [base_token_priceFeedAddress, cacheTwapInterval],
+    log: true,
+  });
+  const chainlinkPriceFeedV2 = await ethers.getContract(
+    "ChainlinkPriceFeedV2",
+    deployer
+  );
+  console.log(
+    "ChainlinkPriceFeedV2 deployed to: ",
+    chainlinkPriceFeedV2.address
+  );
+
+  const BaseToken = await ethers.getContractFactory("BaseToken");
+  const baseToken = await upgrades.deployProxy(BaseToken, [
+    "BaseToken",
+    "BSTK",
+    chainlinkPriceFeedV2.address,
+  ]);
+  console.log("BaseToken deployed to: ", baseToken.address);
 
   const USDC = await ethers.getContractFactory("TestERC20");
   const usdc = await upgrades.deployProxy(USDC, ["TestUSDC", "USDC", 6], {
@@ -73,13 +114,15 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   await clearingHouseConfig.deployed();
   console.log("ClearingHouseConfig deployed to:", clearingHouseConfig.address);
 
-  const QuoteToken = await ethers.getContractFactory("QuoteToken");
-  const quoteToken = await upgrades.deployProxy(QuoteToken, [
-    "Quote Token",
-    "FRTN",
-  ]);
-  await quoteToken.deployed();
-  console.log("QuoteToken deployed to:", quoteToken.address);
+  // prepare uniswap factory
+  await uniswapFactoryContract.createPool(
+    baseToken.address,
+    quoteToken.address,
+    uniFeeTier
+  );
+  console.log("Uniswap pool with base/quote tokens created");
+
+  const poolFactory = await ethers.getContractFactory("UniswapV3Pool");
 
   const MarketRegistry = await ethers.getContractFactory("MarketRegistry");
   const marketRegistry = await upgrades.deployProxy(MarketRegistry, [
@@ -136,7 +179,9 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   await vault.deployed();
   console.log("Vault deployed to: ", vault.address);
 
-  const CollateralManager = await ethers.getContractFactory("CollateralManager");
+  const CollateralManager = await ethers.getContractFactory(
+    "CollateralManager"
+  );
   const collateralManager = await upgrades.deployProxy(CollateralManager, [
     clearingHouseConfig.address,
     vault.address,
@@ -145,28 +190,31 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     500000,  // liquidationRatio
     2000,    // mmRatioBuffer
     30000,   // clInsuranceFundFeeRatio
-    10000e6, // parseUnits("10000", usdcDecimals), // debtThreshold
-    500e6,   // parseUnits("500", usdcDecimals), // collateralValueDust
+    parseUnits("10000", usdcDecimals), // debtThreshold
+    parseUnits("500", usdcDecimals), // collateralValueDust
   ]);
   await collateralManager.deployed();
   console.log("CollateralManager deployed to: ", collateralManager.address);
 
-  // need to figure out the price feed mock contract
-  /*
   await collateralManager.addCollateral(weth.address, {
-    priceFeed: mockedWethPriceFeed.address,
-    collateralRatio: (0.7e6).toString(),
-    discountRatio: (0.1e6).toString(),
-    depositCap: (1000e18).toString(),
+    priceFeed: weth_priceFeedAddress,
+    collateralRatio: 0.7e6,
+    discountRatio: 0.1e6,
+    depositCap: parseUnits("1000", await weth.decimals()),
   });
+  console.log("WETH collateral added");
 
   await collateralManager.addCollateral(wbtc.address, {
-    priceFeed: mockedWbtcPriceFeed.address,
+    priceFeed: wbtc_priceFeedAddress,
     collateralRatio: (0.7e6).toString(),
     discountRatio: (0.1e6).toString(),
-    depositCap: (1000e8).toString(), // parseUnits("1000", await WBTC.decimals()),
+    depositCap: parseUnits("1000", await wbtc.decimals()),
   });
-  */
+  console.log("WBTC collateral added");
+
+  await vault.setCollateralManager(collateralManager.address);
+  await insuranceFund.setBorrower(vault.address);
+  await accountBalance.setVault(vault.address);
 
   /*
   await deploy("YourContract", {
