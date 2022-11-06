@@ -215,7 +215,45 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   await vault.setCollateralManager(collateralManager.address);
   await insuranceFund.setBorrower(vault.address);
   await accountBalance.setVault(vault.address);
+  console.log("Finished setting up vault, insuranceFund, accountBalance");
 
+  // deploy a pool
+  const poolAddr = await uniswapFactoryContract.getPool(
+    baseToken.address,
+    quoteToken.address,
+    uniFeeTier
+  );
+  const pool = poolFactory.attach(poolAddr);
+  await baseToken.addWhitelist(pool.address);
+  await quoteToken.addWhitelist(pool.address);
+  console.log("Finished deploy a pool");
+
+  const ClearingHouse = await ethers.getContractFactory("ClearingHouse");
+  const clearingHouse = await upgrades.deployProxy(ClearingHouse, [
+    clearingHouseConfig.address,
+    vault.address,
+    quoteToken.address,
+    uniswapFactoryContract.address,
+    exchange.address,
+    accountBalance.address,
+    insuranceFund.address,
+  ]);
+  await clearingHouse.deployed();
+  console.log("ClearingHouse deployed to: ", clearingHouse.address);
+
+  await clearingHouseConfig.setSettlementTokenBalanceCap(
+    ethers.constants.MaxUint256
+  );
+  await quoteToken.mintMaximumTo(clearingHouse.address);
+  await baseToken.mintMaximumTo(clearingHouse.address);
+  await quoteToken.addWhitelist(clearingHouse.address);
+  await baseToken.addWhitelist(clearingHouse.address);
+  await marketRegistry.setClearingHouse(clearingHouse.address);
+  await orderBook.setClearingHouse(clearingHouse.address);
+  await exchange.setClearingHouse(clearingHouse.address);
+  await accountBalance.setClearingHouse(clearingHouse.address);
+  await vault.setClearingHouse(clearingHouse.address);
+  console.log("Deployment script done...");
   /*
   await deploy("YourContract", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
