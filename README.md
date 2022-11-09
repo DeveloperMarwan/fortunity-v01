@@ -18,11 +18,18 @@ yarn install
 yarn chain
 ```
 
-> in a second terminal window, setup the Chainlink hardhat starter kit:
+> in a second terminal window, setup the Chainlink hardhat starter kit. You will need the following contract addresses after deployment is done:  
+1. WETH mock aggregator
+2. WBTC mock aggregator
+3. BaseToken mock aggregator
 
 Navigate to https://github.com/DeveloperMarwan/hardhat-starter-kit and follow the instructions there. Please make sure that you use a different folder than the current fortunity-v01 folder.  
 
-> in a third terminal window, 🛰 deploy your fortunity-v01 contracts:
+> in a third terminal window, 🛰 deploy your fortunity-v01 contracts.  
+> before deploying the contracts, navigate to the deployment script at /packages/hardhat/deploy/00_deploy_your_contract.js and update the follwoing values:  
+> 1. weth_priceFeedAddress
+> 2. wbtc_priceFeedAddress
+> 3. base_token_priceFeedAddress
 
 ```bash
 cd fortunity-v01
