@@ -8,6 +8,7 @@ import { VirtualToken } from "./VirtualToken.sol";
 import { BaseTokenStorageV2 } from "./storage/BaseTokenStorage.sol";
 import { IBaseToken } from "./interface/IBaseToken.sol";
 import { BlockContext } from "./base/BlockContext.sol";
+import { FortEventManager } from "./interface/IFortEventManager.sol";
 
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
 contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseTokenStorageV2 {
@@ -137,10 +138,12 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     ///      2. Paused or Closed: the price is twap when the token was paused
     function getIndexPrice(uint256 interval) public view override returns (uint256) {
         if (_status == IBaseToken.Status.Open) {
-            return _formatDecimals(mul(
+            uint256 _indexPrice = _formatDecimals(mul(
                 IPriceFeedV2(_priceFeed).getPrice(interval),
                 FortTfi.getUpdatedTfiValue().div(100).add(10**(_priceFeedDecimals))
                 ));
+            emit IndexPriceUpdated(_indexPrice);
+            return _indexPrice;
         }
 
         return _pausedIndexPrice;
