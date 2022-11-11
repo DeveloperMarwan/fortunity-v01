@@ -17,8 +17,8 @@ contract IFortEventManager {
 
     event ActivityChange(
         Action _action, 
-        uint256 positionSize,
-        uint256 colleratalChange, 
+        int256 positionSize,
+        int256 colleratalChange, 
         uint256 executionPrice, 
         uint256 tradeFee,
         uint256 timestamp);

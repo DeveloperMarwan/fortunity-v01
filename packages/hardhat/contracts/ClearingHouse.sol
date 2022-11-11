@@ -271,7 +271,7 @@ contract ClearingHouse is
             
             emit ActivityChange(
                 Stake,
-                getAccountBalance(params.trader),
+                _getTakerPositionSafe(params.trader, params.baseToken),
                 removedPositionSize,
                 _uniswapV3Factory.getSqrtMarkPriceX96,
                 response.fee,
@@ -364,7 +364,7 @@ contract ClearingHouse is
 
         emit ActivityChange(
             Withdraw,
-            getAccountBalance(params.trader),
+            _getTakerPositionSafe(params.trader, params.baseToken),
             liquidity,
             _uniswapV3Factory.getSqrtMarkPriceX96,
             response.fee,
@@ -543,6 +543,15 @@ contract ClearingHouse is
             IAccountBalance(_accountBalance).settlePositionInClosedMarket(trader, baseToken);
 
         emit PositionClosed(trader, baseToken, positionSize, positionNotional, openNotional, realizedPnl, closedPrice);
+        
+        emit ActivityChange(
+                Withdraw,
+                positionSize,
+                positionSize,
+                closedPrice,
+                0, //fee
+                block.timestamp
+            );
 
         return (positionSize.abs(), positionNotional.abs());
     }
