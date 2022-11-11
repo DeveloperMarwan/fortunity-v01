@@ -12,7 +12,8 @@ contract IFortEventManager {
     // Need to write contract that pulls in priceFeed addresses for tokens
     // in vault to calculate the USDC value of all tokens in Vault
     // The one local priceFeed works for Quote Token to USDC
-    event TotalLiquidity(uint256 _poolLiquidity);
+    event TotalLiquidity(uint256 _vaultPlusPoolLiquidity);
+    event LiquidityInPool(int128 _poolLiquidity);
 
     event ActivityChange(
         Action _action, 
