@@ -6,7 +6,7 @@ pragma abicoder v2;
 
 import { Strings } from "./lib/FortStrings.sol";
 import { ChainlinkClient } from "@chainlink/contracts/src/v0.7/ChainlinkClient.sol";
-import { ConfirmedOwner } from "@chainlink/contracts/src/v0.7/ConfirmedOwner.sol";
+import { ConfirmedOwner } from "@chainlink/contracts/src/v0.7/dev/ConfirmedOwner.sol";
 import { Chainlink } from "@chainlink/contracts/src/v0.7/Chainlink.sol";
 import { LinkTokenInterface } from "@chainlink/contracts/src/v0.7/interfaces/LinkTokenInterface.sol";
 import { SafeMathUpgradeable } from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";

@@ -270,8 +270,8 @@ contract ClearingHouse is
             uint256 sqrtPrice = _getSqrtMarkX96(params.baseToken);
             
             emit ActivityChange(
-                Stake,
-                _getTakerPositionSafe(params.trader, params.baseToken),
+                IFortEventManager.Action.Stake,
+                _getTakerPositionSafe(trader, params.baseToken),
                 removedPositionSize,
                 _uniswapV3Factory.getSqrtMarkPriceX96,
                 response.fee,
@@ -363,9 +363,9 @@ contract ClearingHouse is
         );
 
         emit ActivityChange(
-            Withdraw,
+            IFortEventManager.ActionChanged.Withdraw,
             _getTakerPositionSafe(params.trader, params.baseToken),
-            liquidity,
+            params.liquidity,
             _uniswapV3Factory.getSqrtMarkPriceX96,
             response.fee,
             block.timestamp
@@ -545,7 +545,7 @@ contract ClearingHouse is
         emit PositionClosed(trader, baseToken, positionSize, positionNotional, openNotional, realizedPnl, closedPrice);
         
         emit ActivityChange(
-                Withdraw,
+                IFortEventManager.ActionChanged.Withdraw,
                 positionSize,
                 positionSize,
                 closedPrice,
