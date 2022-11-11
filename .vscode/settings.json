@@ -33,5 +33,7 @@
       "**/yarn.lock": true
    },
    "git.detectSubmodules": false,
-   "task.allowAutomaticTasks": "off"
+   "task.allowAutomaticTasks": "off",
+   "solidity.compileUsingRemoteVersion": "v0.7.6+commit.7338295f",
+   "solidity.defaultCompiler": "localNodeModule"
 }

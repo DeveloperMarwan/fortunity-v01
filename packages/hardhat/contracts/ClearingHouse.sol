@@ -43,7 +43,8 @@ contract ClearingHouse is
     ReentrancyGuardUpgradeable,
     OwnerPausable,
     BaseRelayRecipient,
-    ClearingHouseStorageV2
+    ClearingHouseStorageV2,
+    IFortEventManager
 {
     using AddressUpgradeable for address;
     using SafeMathUpgradeable for uint256;

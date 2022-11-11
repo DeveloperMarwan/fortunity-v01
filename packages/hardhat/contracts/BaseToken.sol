@@ -11,7 +11,7 @@ import { BlockContext } from "./base/BlockContext.sol";
 import { IFortEventManager } from "./interface/IFortEventManager.sol";
 
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
-contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseTokenStorageV2 {
+contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseTokenStorageV2, IFortEventManager {
     using SafeMathUpgradeable for uint256;
     using SafeMathUpgradeable for uint8;
 

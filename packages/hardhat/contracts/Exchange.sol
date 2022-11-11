@@ -36,7 +36,8 @@ contract Exchange is
     BlockContext,
     ClearingHouseCallee,
     UniswapV3CallbackBridge,
-    ExchangeStorageV1
+    ExchangeStorageV1,
+    IFortEventManager
 {
     using AddressUpgradeable for address;
     using SafeMathUpgradeable for uint256;
