@@ -9,7 +9,7 @@ import { ChainlinkClient } from "@chainlink/contracts/src/v0.7/ChainlinkClient.s
 import { ConfirmedOwner } from "@chainlink/contracts/src/v0.7/ConfirmedOwner.sol";
 import { Chainlink } from "@chainlink/contracts/src/v0.7/Chainlink.sol";
 import { LinkTokenInterface } from "@chainlink/contracts/src/v0.7/interfaces/LinkTokenInterface.sol";
-import { SafeMathUpgradeable } from "@openzeppelin-upgradeable/contracts/math/SafeMathUpgradeable.sol";
+import { SafeMathUpgradeable } from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 
 contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
     using Chainlink for Chainlink.Request;
@@ -112,10 +112,13 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         }
     }
 
-    //A fallback chainlink token return function to Proxy
+    //A return function to Proxy
     function returnTokensToProxy () public onlyOwner {
+        //sends LINK
         LinkTokenInterface(getToken()).transfer(msg.sender, 
         LinkTokenInterface(getToken()).balanceOf(address(this)));
+        //sends ETH
+        payable(msg.sender).transfer(address(this).balance);
     }
 
     //
