@@ -8,8 +8,10 @@ contract IFortEventManager {
     event IndexPriceUpdated(uint256 _indexPrice);
     event MarketPriceUpdated(uint256 _mktPrice);
     event FundingRateUpdated(int256 _fundingRate);
-    
-    event IndexTwap(uint256 _indexTwap);
+
+    // Need to write contract that pulls in priceFeed addresses for tokens
+    // in vault to calculate the USDC value of all tokens in Vault
+    // The one local priceFeed works for Quote Token to USDC
     event TotalLiquidity(uint256 _poolLiquidity);
 
     event ActivityChange(
