@@ -163,7 +163,9 @@ contract OrderBook is
                     globalFundingGrowth: params.fundingGrowthGlobal
                 })
             );
-        emit LiquidityInPool(getLiquidity(pool));
+        
+        emit LiquidityInPool(UniswapV3Broker.getLiquidity(pool));
+
         return
             AddLiquidityResponse({
                 base: response.base,
@@ -182,6 +184,9 @@ contract OrderBook is
         _requireOnlyClearingHouse();
         address pool = IMarketRegistry(_marketRegistry).getPool(params.baseToken);
         bytes32 orderId = OpenOrder.calcOrderKey(params.maker, params.baseToken, params.lowerTick, params.upperTick);
+
+        emit LiquidityInPool(UniswapV3Broker.getLiquidity(pool));
+
         return
             _removeLiquidity(
                 InternalRemoveLiquidityParams({
