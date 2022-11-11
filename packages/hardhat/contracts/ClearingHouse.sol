@@ -1079,6 +1079,7 @@ contract ClearingHouse is
     ) internal {
         emit LiquidityChanged(maker, baseToken, quoteToken, lowerTick, upperTick, base, quote, liquidity, quoteFee);
         emit LiquidityInPool(_uniswapV3Factory.getLiquidity());
+        emit MarketPriceUpdated(_uniswapV3Factory.getSqrtMarkPriceX96);
     }
 
     function _referredPositionChanged(bytes32 referralCode) internal {
