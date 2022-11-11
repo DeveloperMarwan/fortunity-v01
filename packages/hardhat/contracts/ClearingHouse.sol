@@ -1095,6 +1095,8 @@ contract ClearingHouse is
             realizedPnl,
             sqrtPriceAfterX96
         );
+        emit MarketPriceUpdated(_getSqrtMarkX96(baseToken));
+
     }
 
     function _emitLiquidityChanged(

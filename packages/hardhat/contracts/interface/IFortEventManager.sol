@@ -21,7 +21,8 @@ contract IFortEventManager {
         int256 colleratalChange, 
         uint160 executionPrice, 
         uint256 tradeFee,
-        uint256 timestamp);
+        uint256 timestamp
+    );
 
     enum Action {
         Buy,
