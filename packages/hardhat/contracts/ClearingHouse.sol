@@ -268,14 +268,16 @@ contract ClearingHouse is
                 );
 
             uint256 sqrtPrice = _getSqrtMarkX96(params.baseToken);
+            
             emit ActivityChange(
                 Stake,
-                getAccountBalance(param.trader),
+                getAccountBalance(params.trader),
                 removedPositionSize,
                 _uniswapV3Factory.getSqrtMarkPriceX96,
                 response.fee,
                 block.timestamp
             );
+
             _emitPositionChanged(
                 trader,
                 params.baseToken,
@@ -358,6 +360,15 @@ contract ClearingHouse is
             response.takerQuote, // exchangedPositionNotional
             response.fee, // makerFee
             0 //takerFee
+        );
+
+        emit ActivityChange(
+            Withdraw,
+            getAccountBalance(params.trader),
+            liquidity,
+            _uniswapV3Factory.getSqrtMarkPriceX96,
+            response.fee,
+            block.timestamp
         );
 
         _emitLiquidityChanged(
