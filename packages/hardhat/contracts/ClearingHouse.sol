@@ -1111,7 +1111,7 @@ contract ClearingHouse is
         uint256 quoteFee
     ) internal {
         emit LiquidityChanged(maker, baseToken, quoteToken, lowerTick, upperTick, base, quote, liquidity, quoteFee);
-        emit LiquidityInPool(_uniswapV3Factory.getLiquidity());
+        //emit LiquidityInPool(_uniswapV3Factory.getLiquidity());
         emit MarketPriceUpdated(_getSqrtMarkX96(baseToken));
     }
 
