@@ -6,7 +6,7 @@ pragma solidity 0.7.6;
 contract IFortEventManager {
     // Added to simplify data collection for Kevin, temporary
     event IndexPriceUpdated(uint256 _indexPrice);
-    event MarketPriceUpdated(uint256 _mktPrice);
+    event MarketPriceUpdated(uint160 _mktPrice);
     event FundingRateUpdated(int256 _fundingRate);
 
     // Need to write contract that pulls in priceFeed addresses for tokens
@@ -19,7 +19,7 @@ contract IFortEventManager {
         Action _action, 
         int256 positionSize,
         int256 colleratalChange, 
-        uint256 executionPrice, 
+        uint160 executionPrice, 
         uint256 tradeFee,
         uint256 timestamp);
 

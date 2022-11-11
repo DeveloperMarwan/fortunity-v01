@@ -34,6 +34,7 @@ import { AccountMarket } from "./lib/AccountMarket.sol";
 import { OpenOrder } from "./lib/OpenOrder.sol";
 import { IFortEventManager } from "./interface/IFortEventManager.sol";
 
+
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
 contract ClearingHouse is
     IUniswapV3MintCallback,
@@ -104,7 +105,8 @@ contract ClearingHouse is
         address uniV3FactoryArg,
         address exchangeArg,
         address accountBalanceArg,
-        address insuranceFundArg
+        address insuranceFundArg,
+        address marketRegistryArg
     ) public initializer {
         // CH_VANC: Vault address is not contract
         _isContract(vaultArg, "CH_VANC");
@@ -273,7 +275,7 @@ contract ClearingHouse is
                 IFortEventManager.Action.Stake,
                 _getTakerPositionSafe(trader, params.baseToken),
                 removedPositionSize,
-                _uniswapV3Factory.getSqrtMarkPriceX96,
+                sqrtPrice,
                 response.fee,
                 block.timestamp
             );
@@ -364,9 +366,9 @@ contract ClearingHouse is
 
         emit ActivityChange(
             IFortEventManager.ActionChanged.Withdraw,
-            _getTakerPositionSafe(params.trader, params.baseToken),
+            _getTakerPositionSafe(trader, params.baseToken),
             params.liquidity,
-            _uniswapV3Factory.getSqrtMarkPriceX96,
+            _getSqrtMarkX96(params.baseToken),
             response.fee,
             block.timestamp
         );
@@ -1108,7 +1110,7 @@ contract ClearingHouse is
     ) internal {
         emit LiquidityChanged(maker, baseToken, quoteToken, lowerTick, upperTick, base, quote, liquidity, quoteFee);
         emit LiquidityInPool(_uniswapV3Factory.getLiquidity());
-        emit MarketPriceUpdated(_uniswapV3Factory.getSqrtMarkPriceX96);
+        emit MarketPriceUpdated(_getSqrtMarkX96(baseToken));
     }
 
     function _referredPositionChanged(bytes32 referralCode) internal {
