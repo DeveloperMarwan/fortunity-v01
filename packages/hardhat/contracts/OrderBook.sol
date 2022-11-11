@@ -23,6 +23,7 @@ import { IMarketRegistry } from "./interface/IMarketRegistry.sol";
 import { OrderBookStorageV1 } from "./storage/OrderBookStorage.sol";
 import { IOrderBook } from "./interface/IOrderBook.sol";
 import { OpenOrder } from "./lib/OpenOrder.sol";
+import { IFortEventManager } from "./interface/IFortEventManager.sol";
 
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
 contract OrderBook is
@@ -30,7 +31,8 @@ contract OrderBook is
     IUniswapV3MintCallback,
     ClearingHouseCallee,
     UniswapV3CallbackBridge,
-    OrderBookStorageV1
+    OrderBookStorageV1,
+    IFortEventManager
 {
     using SafeMathUpgradeable for uint256;
     using SafeMathUpgradeable for uint128;
@@ -161,7 +163,7 @@ contract OrderBook is
                     globalFundingGrowth: params.fundingGrowthGlobal
                 })
             );
-
+        emit LiquidityInPool(getLiquidity(pool));
         return
             AddLiquidityResponse({
                 base: response.base,
