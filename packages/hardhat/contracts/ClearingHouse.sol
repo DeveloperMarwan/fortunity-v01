@@ -1077,8 +1077,8 @@ contract ClearingHouse is
         int128 liquidity,
         uint256 quoteFee
     ) internal {
-        emit LiquidityInPool(_uniswapV3Factory.getLiquidity());
         emit LiquidityChanged(maker, baseToken, quoteToken, lowerTick, upperTick, base, quote, liquidity, quoteFee);
+        emit LiquidityInPool(_uniswapV3Factory.getLiquidity());
     }
 
     function _referredPositionChanged(bytes32 referralCode) internal {
