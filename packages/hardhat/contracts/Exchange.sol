@@ -27,6 +27,7 @@ import { IBaseToken } from "./interface/IBaseToken.sol";
 import { ExchangeStorageV1 } from "./storage/ExchangeStorage.sol";
 import { IExchange } from "./interface/IExchange.sol";
 import { OpenOrder } from "./lib/OpenOrder.sol";
+import { IFortEventManager } from "./interface/IFortEventManager.sol";
 
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
 contract Exchange is
@@ -629,6 +630,7 @@ contract Exchange is
                     timestamp.sub(lastSettledTimestamp).toInt256()
                 );
             fundingGrowthGlobal.twPremiumX96 = lastFundingGrowthGlobal.twPremiumX96.add(deltaTwPremiumX96);
+            emit FundingRateUpdated(fundingGrowthGlobal.twPremiumX96);
 
             // overflow inspection:
             // assuming premium = 1 billion (1e9), time diff = 1 year (3600 * 24 * 365)

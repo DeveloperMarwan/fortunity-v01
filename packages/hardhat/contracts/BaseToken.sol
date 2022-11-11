@@ -8,7 +8,7 @@ import { VirtualToken } from "./VirtualToken.sol";
 import { BaseTokenStorageV2 } from "./storage/BaseTokenStorage.sol";
 import { IBaseToken } from "./interface/IBaseToken.sol";
 import { BlockContext } from "./base/BlockContext.sol";
-import { FortEventManager } from "./interface/IFortEventManager.sol";
+import { IFortEventManager } from "./interface/IFortEventManager.sol";
 
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
 contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseTokenStorageV2 {
