@@ -105,8 +105,7 @@ contract ClearingHouse is
         address uniV3FactoryArg,
         address exchangeArg,
         address accountBalanceArg,
-        address insuranceFundArg,
-        address marketRegistryArg
+        address insuranceFundArg
     ) public initializer {
         // CH_VANC: Vault address is not contract
         _isContract(vaultArg, "CH_VANC");
