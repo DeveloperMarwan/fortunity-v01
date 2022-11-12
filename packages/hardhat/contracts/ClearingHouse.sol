@@ -365,7 +365,7 @@ contract ClearingHouse is
         );
 
         emit ActivityChange(
-            IFortEventManager.ActionChanged.Withdraw,
+            IFortEventManager.Action.Withdraw,
             _getTakerPositionSafe(trader, params.baseToken),
             params.liquidity,
             _getSqrtMarkX96(params.baseToken),
@@ -556,7 +556,7 @@ contract ClearingHouse is
         emit PositionClosed(trader, baseToken, positionSize, positionNotional, openNotional, realizedPnl, closedPrice);
         
         emit ActivityChange(
-                IFortEventManager.ActionChanged.Withdraw,
+                IFortEventManager.Action.Withdraw,
                 positionSize,
                 positionSize,
                 closedPrice,
