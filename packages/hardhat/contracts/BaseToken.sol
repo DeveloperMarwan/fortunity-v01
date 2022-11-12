@@ -16,6 +16,9 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     using SafeMathUpgradeable for uint256;
     using SafeMathUpgradeable for uint8;
 
+    // Added for FortTfi
+    FortTfi private _fortTfi;
+
     //
     // CONSTANT
     //
@@ -30,7 +33,8 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     function initialize(
         string memory nameArg,
         string memory symbolArg,
-        address priceFeedArg
+        address priceFeedArg,
+        address fortTfi
     ) external initializer {
         __VirtualToken_init(nameArg, symbolArg);
 
@@ -41,6 +45,7 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
 
         _priceFeed = priceFeedArg;
         _priceFeedDecimals = priceFeedDecimals;
+        _fortTfi = FortTfi(fortTfi);
     }
 
     function pause() external onlyOwner {
@@ -139,9 +144,9 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     ///      2. Paused or Closed: the price is twap when the token was paused
     function getIndexPrice(uint256 interval) public view override returns (uint256) {
         if (_status == IBaseToken.Status.Open) {
-            uint256 _indexPrice = _formatDecimals(mul(
-                IPriceFeedV2(_priceFeed).getPrice(interval),
-                FortTfi.getUpdatedTfiValue().div(100).add(10**(_priceFeedDecimals))
+            uint256 _indexPrice = _formatDecimals(
+                IPriceFeedV2(_priceFeed).getPrice(interval).mul(
+                _fortTfi.getUpdatedTfiValue().div(100).add(10**(_priceFeedDecimals))
                 ));
             emit IndexPriceUpdated(_indexPrice);
             return _indexPrice;

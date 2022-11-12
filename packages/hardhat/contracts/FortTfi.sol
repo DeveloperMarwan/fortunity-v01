@@ -104,7 +104,7 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         lastTfiUpdatedBlock = block.timestamp;
     }
 
-    function getUpdatedTfiValue() public returns (int256 tfiValue) {
+    function getUpdatedTfiValue() public returns (uint256 tfiValue) {
         if (block.timestamp >= lastTfiUpdatedBlock.add(tfiUpdateInterval)) {
             return getInt256(doTransferAndRequest(TfiRequest, fee));
         } else {
