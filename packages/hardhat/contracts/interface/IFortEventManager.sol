@@ -13,13 +13,13 @@ contract IFortEventManager {
     // in vault to calculate the USDC value of all tokens in Vault
     // The one local priceFeed works for Quote Token to USDC
     event TotalLiquidity(uint256 _vaultPlusPoolLiquidity);
-    event LiquidityInPool(int128 _poolLiquidity);
+    event LiquidityInPool(uint128 _poolLiquidity);
 
     event ActivityChange(
         Action _action, 
         int256 positionSize,
         int256 colleratalChange, 
-        uint160 executionPrice, 
+        uint256 executionPrice, 
         uint256 tradeFee,
         uint256 timestamp
     );

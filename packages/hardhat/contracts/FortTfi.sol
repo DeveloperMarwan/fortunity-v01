@@ -16,6 +16,7 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
     using SafeMathUpgradeable for uint256;
 
     bytes public result;
+    bytes32 internal requestId;
     mapping(bytes32 => bytes) public results;
     uint256 public lastTfiUpdatedBlock;
     uint256 public tfiUpdateInterval = 1 days;
@@ -101,14 +102,15 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         public recordChainlinkFulfillment(_requestId) {
         result = bytesData;
         results[_requestId] = bytesData;
+        requestId = _requestId;
         lastTfiUpdatedBlock = block.timestamp;
     }
 
-    function getUpdatedTfiValue() public returns (uint256 tfiValue) {
+    function updateTfiValue() public returns (int256 tfiValue) {
         if (block.timestamp >= lastTfiUpdatedBlock.add(tfiUpdateInterval)) {
             return getInt256(doTransferAndRequest(TfiRequest, fee));
         } else {
-            return getInt256(bytesToBytes32(result));
+            return getInt256(requestId);
         }
     }
 
@@ -175,6 +177,10 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
 
     function getInt256(bytes32 _requestId) public view returns (int256) {
        return toInt256(results[_requestId]);
+    }
+
+    function getTfiValue() public view returns (int256) {
+        return getInt256(requestId);
     }
 
     //

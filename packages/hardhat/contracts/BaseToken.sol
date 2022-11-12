@@ -146,9 +146,8 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
         if (_status == IBaseToken.Status.Open) {
             uint256 _indexPrice = _formatDecimals(
                 IPriceFeedV2(_priceFeed).getPrice(interval).mul(
-                _fortTfi.getUpdatedTfiValue().div(100).add(10**(_priceFeedDecimals))
+                uint256(_fortTfi.getTfiValue()).div(100).add(10**(_priceFeedDecimals))
                 ));
-            emit IndexPriceUpdated(_indexPrice);
             return _indexPrice;
         }
 

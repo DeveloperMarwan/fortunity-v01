@@ -512,6 +512,7 @@ contract Exchange is
         if (_firstTradedTimestampMap[params.baseToken] == 0) {
             _firstTradedTimestampMap[params.baseToken] = _blockTimestamp();
         }
+        emit FundingRateUpdated(fundingGrowthGlobal.twPremiumX96);
 
         return
             InternalSwapResponse({
@@ -631,7 +632,6 @@ contract Exchange is
                     timestamp.sub(lastSettledTimestamp).toInt256()
                 );
             fundingGrowthGlobal.twPremiumX96 = lastFundingGrowthGlobal.twPremiumX96.add(deltaTwPremiumX96);
-            emit FundingRateUpdated(fundingGrowthGlobal.twPremiumX96);
 
             // overflow inspection:
             // assuming premium = 1 billion (1e9), time diff = 1 year (3600 * 24 * 365)

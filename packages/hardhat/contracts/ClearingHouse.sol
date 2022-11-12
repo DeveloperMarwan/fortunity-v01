@@ -492,7 +492,7 @@ contract ClearingHouse is
             IFortEventManager.Action.Sell,
             positionSize,
             response.exchangedPositionSize,
-            response.sqrtPriceLimitX96,
+            response.sqrtPriceAfterX96,
             response.fee,
             block.timestamp
         );
@@ -1029,9 +1029,9 @@ contract ClearingHouse is
         emit ActivityChange(
             IFortEventManager.Action.Buy,
             _getTakerPositionSafe(trader, params.baseToken),
-            params.amount,
+            int256(params.amount),
             params.sqrtPriceLimitX96,
-            response.fee,
+            uint256(response.fee),
             block.timestamp
         );
 
