@@ -304,7 +304,7 @@ contract ClearingHouse is
         emit ActivityChange(
             IFortEventManager.Action.Stake,
             _getTakerPositionSafe(trader, params.baseToken),
-            removedPositionSize,
+            response.liquidity.toInt256(),
             _getSqrtMarkX96(params.baseToken),
             response.fee,
             block.timestamp
