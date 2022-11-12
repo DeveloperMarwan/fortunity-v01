@@ -488,6 +488,15 @@ contract ClearingHouse is
 
         _referredPositionChanged(params.referralCode);
 
+        emit ActivityChange(
+            IFortEventManager.Action.Sell,
+            positionSize,
+            response.exchangedPositionSize,
+            response.sqrtPriceLimitX96,
+            response.fee,
+            block.timestamp
+        );
+
         return (response.base, response.quote);
     }
 
@@ -1016,6 +1025,15 @@ contract ClearingHouse is
         );
 
         _referredPositionChanged(params.referralCode);
+
+        emit ActivityChange(
+            IFortEventManager.Action.Buy,
+            _getTakerPositionSafe(trader, params.baseToken),
+            params.amount,
+            params.sqrtPriceLimitX96,
+            response.fee,
+            block.timestamp
+        );
 
         return (response.base, response.quote, response.fee);
     }
