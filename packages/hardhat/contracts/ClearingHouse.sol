@@ -270,15 +270,6 @@ contract ClearingHouse is
                 );
 
             uint256 sqrtPrice = _getSqrtMarkX96(params.baseToken);
-            
-            emit ActivityChange(
-                IFortEventManager.Action.Stake,
-                _getTakerPositionSafe(trader, params.baseToken),
-                removedPositionSize,
-                sqrtPrice,
-                response.fee,
-                block.timestamp
-            );
 
             _emitPositionChanged(
                 trader,
@@ -308,6 +299,15 @@ contract ClearingHouse is
             response.quote.toInt256(),
             response.liquidity.toInt128(),
             response.fee
+        );
+
+        emit ActivityChange(
+            IFortEventManager.Action.Stake,
+            _getTakerPositionSafe(trader, params.baseToken),
+            removedPositionSize,
+            _getSqrtMarkX96(params.baseToken),
+            response.fee,
+            block.timestamp
         );
 
         return
