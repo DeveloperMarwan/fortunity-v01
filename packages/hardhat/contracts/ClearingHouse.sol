@@ -681,6 +681,18 @@ contract ClearingHouse is
         return IVault(_vault).getAccountValue(trader).parseSettlementToken(_settlementTokenDecimals);
     }
 
+    function getIndexPrice(address _baseToken) external view returns (uint256) {
+        return _getIndexPrice(_baseToken);
+    }
+
+    function getSqrtMarkX96(address baseToken) external view returns (uint256) {
+        return _getSqrtMarkX96(baseToken);
+    }
+
+    function getPoolLiquidity(address trader, address baseToken, bool fetchBase) external view returns (uint256 liquidity) {
+        (liquidity,) = IOrderBook(_orderBook).getTotalTokenAmountInPoolAndPendingFee(trader, baseToken, fetchBase);
+    }
+
     //
     // INTERNAL NON-VIEW
     //
