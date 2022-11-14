@@ -92,6 +92,9 @@ contract ClearingHouse is
         _;
     }
 
+    // Funding Rate
+    int256 __twPremiumX96;
+
     //
     // EXTERNAL NON-VIEW
     //
@@ -693,6 +696,10 @@ contract ClearingHouse is
         (liquidity,) = IOrderBook(_orderBook).getTotalTokenAmountInPoolAndPendingFee(trader, baseToken, fetchBase);
     }
 
+    function getGlobalFundingRate() external view returns (int256) {
+        return __twPremiumX96;
+    }
+
     //
     // INTERNAL NON-VIEW
     //
@@ -1075,6 +1082,7 @@ contract ClearingHouse is
             baseToken,
             fundingGrowthGlobal.twPremiumX96
         );
+        __twPremiumX96 = fundingGrowthGlobal.twPremiumX96;
         return fundingGrowthGlobal;
     }
 
