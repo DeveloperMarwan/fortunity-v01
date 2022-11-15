@@ -106,11 +106,9 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         lastTfiUpdatedBlock = block.timestamp;
     }
 
-    function updateTfiValue() public returns (int256 tfiValue) {
+    function updateTfiValue() public {
         if (block.timestamp >= lastTfiUpdatedBlock.add(tfiUpdateInterval)) {
-            return getInt256(doTransferAndRequest(TfiRequest, fee));
-        } else {
-            return getInt256(requestId);
+            doTransferAndRequest(TfiRequest, fee);
         }
     }
 
@@ -203,5 +201,11 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         assembly {
             result_ := mload(add(source, 32))
         }
+    }
+
+    // External - ONLY FOR TESTING, Get rid of b4 deployment
+    function setTfiValue(bytes32 id, bytes memory value) external {
+        requestId = id;
+        results[id] = value;
     }
 }
