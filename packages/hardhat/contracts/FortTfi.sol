@@ -47,7 +47,7 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         uint256 fee_,
         address token_
         //changed from initilizer ConfirmedOwner
-    ) internal onlyOwner {
+    ) public onlyOwner {
         setChainlinkToken(token_);
         oracleId = oracleId_;
         jobId = jobId_;
