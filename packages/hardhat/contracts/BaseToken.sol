@@ -33,8 +33,7 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     function initialize(
         string memory nameArg,
         string memory symbolArg,
-        address priceFeedArg,
-        address fortTfi
+        address priceFeedArg
     ) external initializer {
         __VirtualToken_init(nameArg, symbolArg);
 
@@ -45,7 +44,6 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
 
         _priceFeed = priceFeedArg;
         _priceFeedDecimals = priceFeedDecimals;
-        _fortTfi = FortTfi(fortTfi);
     }
 
     function pause() external onlyOwner {
@@ -86,6 +84,10 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
 
     function cacheTwap(uint256 interval) external override {
         IPriceFeedV2(_priceFeed).cacheTwap(interval);
+    }
+
+    function setTfiContract(address fortTfi) external {
+        _fortTfi = FortTfi(fortTfi);
     }
 
     //
