@@ -29,7 +29,12 @@ Navigate to https://github.com/DeveloperMarwan/hardhat-starter-kit and follow th
 > before deploying the contracts, navigate to the deployment script at /packages/hardhat/deploy/00_deploy_your_contract.js and update the follwoing values:  
 > 1. weth_priceFeedAddress
 > 2. wbtc_priceFeedAddress
-> 3. base_token_priceFeedAddress
+> 3. vMATICpriceFeedAddress
+> 4. linkTokenAddress
+> 5. truflationJobId
+> 6. truflationFee
+> 7. truflationConsumerAddress
+> 8. traderWalletAddress (This should be the address of the wallet that will interact with the dApp)
 
 ```bash
 cd fortunity-v01
@@ -43,7 +48,8 @@ Before starting the front-end app, we need to manually add the ClearingHouse con
 4. add a new element at the end as per the image below. Use the abi element that you copied from step 2 above. You can get the address of the depoyed ClearingHouse contract from the terminal window where you ran the yarn depoy command for fortunity-v01 contracts. Please note that the "abi" elements in the screen shot are collapsed for display purposes.    
 ![Tux, the Linux mascot](https://user-images.githubusercontent.com/17074344/200719616-17572675-587d-4c66-995f-0c4f9d021641.png)
 
-> **IMPORTANT**: Since the contract's address changes with each deployment, it will need to be updated in the hardhat_contracts.json file as well.
+> **IMPORTANT**: Since the contract's address changes with each deployment, it will need to be updated in the hardhat_contracts.json file as well.<br>
+> **IMPORTANT**: The deployment script will mint 1,000,000 USDC to the trader wallet address to use to interact with the dApp. Use the USDC contract address to import the tokens into MetaMask on the local network 8545.
 
 > in a fourth terminal window, start your 📱 frontend:
 

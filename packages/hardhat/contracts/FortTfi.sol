@@ -41,6 +41,25 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
     // INTERNAL NON-VIEW
     //
 
+    constructor(        
+            address oracleId_,
+            string memory jobId_,
+            uint256 fee_,
+            address token_) {
+        setChainlinkToken(token_);
+        oracleId = oracleId_;
+        jobId = jobId_;
+        fee = fee_;
+        TfiRequest = RequestData(
+            "truflation/current", 
+            "yearOverYearInflation", 
+            "int256", 
+            "2", 
+            '{"location":"us"}'
+        );            
+    }
+    
+    /*
     function initialize(
         address oracleId_,
         string memory jobId_,
@@ -60,6 +79,7 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
             '{"location":"us"}'
         );
     }
+    */
 
     //
     // PUBLIC NON-VIEW

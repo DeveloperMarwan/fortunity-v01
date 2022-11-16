@@ -29,43 +29,62 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const chainId = await getChainId();
   const uniFeeTier = 10000; // 1%
 
-  const weth_priceFeedAddress = "0x7969c5eD335650692Bc04293B07F5BF2e7A673C0";
-  const wbtc_priceFeedAddress = "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650";
-  const base_token_priceFeedAddress =
-    "0xc351628EB244ec633d5f21fBD6621e1a683B1181";
+  const wethPriceFeedAddress = "0x851356ae760d987E095750cCeb3bC6014560891C";
+  const wbtcPriceFeedAddress = "0xf5059a5D33d5853360D16C683c16e67980206f36";
+  const vMATICpriceFeedAddress = "0x95401dc811bb5740090279Ba06cfA8fcF6113778";
+  // const truflationOracleAddress = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690";
+  const linkTokenAddress = "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E";
+  const truflationJobId = "2e1bcb542b9d127789985dfd01653be7";
+  const truflationFee = ethers.utils.parseEther("0.1"); // 100000000000000000
+  const truflationConsumerAddress =
+    "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB";
+  const traderWalletAddress = "0xe533a62026fd9F3F362c7506f7f2Bd5332e37BBa"; // TESTING ONLY!!!
 
   const cacheTwapInterval = 15 * 60;
 
-  const QuoteToken = await ethers.getContractFactory("QuoteToken");
-  const quoteToken = await upgrades.deployProxy(QuoteToken, [
-    "Quote Token",
-    "FRTN",
-  ]);
-  await quoteToken.deployed();
-  console.log("QuoteToken deployed to:", quoteToken.address);
-
-  await deploy("ChainlinkPriceFeedV2", {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
+  await deploy("FortTfi", {
     from: deployer,
-    args: [base_token_priceFeedAddress, cacheTwapInterval],
+    args: [
+      truflationConsumerAddress,
+      truflationJobId,
+      truflationFee,
+      linkTokenAddress,
+    ],
     log: true,
   });
-  const chainlinkPriceFeedV2 = await ethers.getContract(
-    "ChainlinkPriceFeedV2",
+  const fortTfi = await ethers.getContract("FortTfi", deployer);
+  console.log("FortTfi deployed to: ", fortTfi.address);
+
+  const QuoteToken = await ethers.getContractFactory("QuoteToken");
+  const quoteToken = await upgrades.deployProxy(QuoteToken, ["vUSD", "vUSD"]);
+  await quoteToken.deployed();
+  console.log("QuoteToken vUSD deployed to:", quoteToken.address);
+
+  await deploy("MATICUSDChainlinkPriceFeedV2", {
+    from: deployer,
+    contract: "ChainlinkPriceFeedV2",
+    args: [vMATICpriceFeedAddress, cacheTwapInterval],
+    log: true,
+  });
+  const MATICUSDChainlinkPriceFeedV2 = await ethers.getContract(
+    "MATICUSDChainlinkPriceFeedV2",
     deployer
   );
   console.log(
-    "ChainlinkPriceFeedV2 deployed to: ",
-    chainlinkPriceFeedV2.address
+    "MATICUSDChainlinkPriceFeedV2 deployed to: ",
+    MATICUSDChainlinkPriceFeedV2.address
   );
 
   const BaseToken = await ethers.getContractFactory("BaseToken");
   const baseToken = await upgrades.deployProxy(BaseToken, [
-    "BaseToken",
-    "BSTK",
-    chainlinkPriceFeedV2.address,
+    "vMATIC",
+    "vMATIC",
+    MATICUSDChainlinkPriceFeedV2.address,
   ]);
-  console.log("BaseToken deployed to: ", baseToken.address);
+  await baseToken.deployed();
+  console.log("BaseToken vMATIC deployed to: ", baseToken.address);
+  await baseToken.setTfiContract(fortTfi.address);
+  console.log("BaseToken.setTfiContract called");
 
   const USDC = await ethers.getContractFactory("TestERC20");
   const usdc = await upgrades.deployProxy(USDC, ["TestUSDC", "USDC", 6], {
@@ -74,6 +93,8 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   await usdc.deployed();
   console.log("USDC deployed to: ", usdc.address);
   const usdcDecimals = await usdc.decimals();
+  await usdc.mint(traderWalletAddress, ethers.utils.parseEther("1000000"));
+  console.log("Minted 1M USDC to trader wallet....WooHoo we are rich!!");
 
   const WETH = await ethers.getContractFactory("TestERC20");
   const weth = await upgrades.deployProxy(WETH, ["TestWETH", "WETH", 18], {
@@ -197,7 +218,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   console.log("CollateralManager deployed to: ", collateralManager.address);
 
   await collateralManager.addCollateral(weth.address, {
-    priceFeed: weth_priceFeedAddress,
+    priceFeed: wethPriceFeedAddress,
     collateralRatio: 0.7e6,
     discountRatio: 0.1e6,
     depositCap: parseUnits("1000", await weth.decimals()),
@@ -205,7 +226,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   console.log("WETH collateral added");
 
   await collateralManager.addCollateral(wbtc.address, {
-    priceFeed: wbtc_priceFeedAddress,
+    priceFeed: wbtcPriceFeedAddress,
     collateralRatio: (0.7e6).toString(),
     discountRatio: (0.1e6).toString(),
     depositCap: parseUnits("1000", await wbtc.decimals()),
