@@ -29,9 +29,10 @@ import { Collateral } from "./lib/Collateral.sol";
 import { IVault } from "./interface/IVault.sol";
 import { IWETH9 } from "./interface/external/IWETH9.sol";
 import { ICollateralManager } from "./interface/ICollateralManager.sol";
+import { IFortEventManager } from "./interface/IFortEventManager.sol";
 
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
-contract Vault is IVault, ReentrancyGuardUpgradeable, OwnerPausable, BaseRelayRecipient, VaultStorageV2 {
+contract Vault is IVault, ReentrancyGuardUpgradeable, OwnerPausable, BaseRelayRecipient, VaultStorageV2, IFortEventManager {
     using SafeMathUpgradeable for uint256;
     using PerpSafeCast for uint256;
     using PerpSafeCast for int256;
@@ -623,6 +624,14 @@ contract Vault is IVault, ReentrancyGuardUpgradeable, OwnerPausable, BaseRelayRe
         require(amount > 0, "V_ZA");
         _transferTokenIn(token, from, amount);
         _checkDepositCapAndRegister(token, to, amount);
+        emit ActivityChange(
+            IFortEventManager.Action.Stake,
+            getBalanceByToken(from, token),
+            int256(amount),
+            uint256(IExchange(_exchange).getSqrtMarkTwapX96(token, 0)),
+            amount.div(100), //1% fee
+            block.timestamp
+        );
     }
 
     /// @param to deposit ETH to this address
@@ -694,6 +703,14 @@ contract Vault is IVault, ReentrancyGuardUpgradeable, OwnerPausable, BaseRelayRe
         _settleAndDecreaseBalance(to, token, amount);
         SafeERC20Upgradeable.safeTransfer(IERC20Upgradeable(token), to, amount);
         emit Withdrawn(token, to, amount);
+        emit ActivityChange(
+            IFortEventManager.Action.Sell,
+            getBalanceByToken(msg.sender, token),
+            int256(amount),
+            uint256(IExchange(_exchange).getSqrtMarkTwapX96(token, 0)),
+            amount.div(100), //1% fee
+            block.timestamp
+        );
     }
 
     function _withdrawEther(address to, uint256 amount) internal {
