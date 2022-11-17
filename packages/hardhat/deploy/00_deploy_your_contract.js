@@ -11,7 +11,7 @@ const {
 const { upgrades, ethers } = require("hardhat");
 const { parseEther, parseUnits } = require("ethers/lib/utils");
 const uniswapFactory = require("../artifacts/@uniswap/v3-core/contracts/UniswapV3Factory.sol/UniswapV3Factory.json");
-
+const { encodePriceSqrt } = require("../scripts/utilities");
 
 const localChainId = "31337";
 
@@ -55,11 +55,6 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const fortTfi = await ethers.getContract("FortTfi", deployer);
   console.log("FortTfi deployed to: ", fortTfi.address);
 
-  const QuoteToken = await ethers.getContractFactory("QuoteToken");
-  const quoteToken = await upgrades.deployProxy(QuoteToken, ["vUSD", "vUSD"]);
-  await quoteToken.deployed();
-  console.log("QuoteToken vUSD deployed to:", quoteToken.address);
-
   await deploy("MATICUSDChainlinkPriceFeedV2", {
     from: deployer,
     contract: "ChainlinkPriceFeedV2",
@@ -85,6 +80,11 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   console.log("BaseToken vMATIC deployed to: ", baseToken.address);
   await baseToken.setTfiContract(fortTfi.address);
   console.log("BaseToken.setTfiContract called");
+
+  const QuoteToken = await ethers.getContractFactory("QuoteToken");
+  const quoteToken = await upgrades.deployProxy(QuoteToken, ["vUSD", "vUSD"]);
+  await quoteToken.deployed();
+  console.log("QuoteToken vUSD deployed to:", quoteToken.address);
 
   const USDC = await ethers.getContractFactory("TestERC20");
   const usdc = await upgrades.deployProxy(USDC, ["TestUSDC", "USDC", 6], {
@@ -238,17 +238,6 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   await accountBalance.setVault(vault.address);
   console.log("Finished setting up vault, insuranceFund, accountBalance");
 
-  // deploy a pool
-  const poolAddr = await uniswapFactoryContract.getPool(
-    baseToken.address,
-    quoteToken.address,
-    uniFeeTier
-  );
-  const pool = poolFactory.attach(poolAddr);
-  await baseToken.addWhitelist(pool.address);
-  await quoteToken.addWhitelist(pool.address);
-  console.log("Finished deploy a pool");
-
   const ClearingHouse = await ethers.getContractFactory("ClearingHouse");
   const clearingHouse = await upgrades.deployProxy(ClearingHouse, [
     clearingHouseConfig.address,
@@ -274,6 +263,35 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   await exchange.setClearingHouse(clearingHouse.address);
   await accountBalance.setClearingHouse(clearingHouse.address);
   await vault.setClearingHouse(clearingHouse.address);
+
+  // deploy a pool
+  const poolAddr = await uniswapFactoryContract.getPool(
+    baseToken.address,
+    quoteToken.address,
+    uniFeeTier
+  );
+  const initPrice = "151.373306858723226652";
+  const exFeeRatio = 10000; // 1%
+  const ifFeeRatio = 100000; // 10%
+  const uniPool = poolFactory.attach(poolAddr);
+  await baseToken.addWhitelist(uniPool.address);
+  await quoteToken.addWhitelist(uniPool.address);
+  console.log("Finished deploy a pool");
+  console.log("After step 1");
+  await uniPool.initialize(encodePriceSqrt(initPrice, "1"));
+  console.log("After step 2");
+  const uniFeeRatio = await uniPool.fee();
+  console.log("After step 3");
+  // the initial number of oracle can be recorded is 1; thus, have to expand it
+  await uniPool.increaseObservationCardinalityNext(500);
+  console.log("After step 4");
+  await marketRegistry.addPool(baseToken.address, uniFeeRatio);
+  console.log("After step 5");
+  await marketRegistry.setFeeRatio(baseToken.address, exFeeRatio);
+  console.log("After step 6");
+  await marketRegistry.setInsuranceFundFeeRatio(baseToken.address, ifFeeRatio);
+  console.log("After step 7");
+
   console.log("Deployment script done...");
   /*
   await deploy("YourContract", {
