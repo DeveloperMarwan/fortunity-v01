@@ -703,14 +703,6 @@ contract Vault is IVault, ReentrancyGuardUpgradeable, OwnerPausable, BaseRelayRe
         _settleAndDecreaseBalance(to, token, amount);
         SafeERC20Upgradeable.safeTransfer(IERC20Upgradeable(token), to, amount);
         emit Withdrawn(token, to, amount);
-        emit ActivityChange(
-            IFortEventManager.Action.Sell,
-            getBalanceByToken(msg.sender, token),
-            int256(amount),
-            uint256(IExchange(_exchange).getSqrtMarkTwapX96(token, 0)),
-            amount.div(100), //1% fee
-            block.timestamp
-        );
     }
 
     function _withdrawEther(address to, uint256 amount) internal {
