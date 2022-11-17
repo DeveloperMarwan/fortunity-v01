@@ -624,14 +624,6 @@ contract Vault is IVault, ReentrancyGuardUpgradeable, OwnerPausable, BaseRelayRe
         require(amount > 0, "V_ZA");
         _transferTokenIn(token, from, amount);
         _checkDepositCapAndRegister(token, to, amount);
-        emit ActivityChange(
-            IFortEventManager.Action.Stake,
-            getBalanceByToken(from, token),
-            int256(amount),
-            uint256(IExchange(_exchange).getSqrtMarkTwapX96(token, 0)),
-            amount.div(100), //1% fee
-            block.timestamp
-        );
     }
 
     /// @param to deposit ETH to this address
