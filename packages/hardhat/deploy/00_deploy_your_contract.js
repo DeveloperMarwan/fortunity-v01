@@ -23,7 +23,7 @@ const localChainId = "31337";
 //     }, ms)
 //   );
 
-module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
+module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
@@ -98,7 +98,7 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
 
   const USDC = await ethers.getContractFactory("TestERC20");
   const usdc = await upgrades.deployProxy(USDC, ["TestUSDC", "USDC", 6], {
-      initializer: "__TestERC20_init",
+    initializer: "__TestERC20_init",
   });
   await usdc.deployed();
   console.log("USDC deployed to: ", usdc.address);
@@ -108,14 +108,14 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
 
   const WETH = await ethers.getContractFactory("TestERC20");
   const weth = await upgrades.deployProxy(WETH, ["TestWETH", "WETH", 18], {
-      initializer: "__TestERC20_init",
+    initializer: "__TestERC20_init",
   });
   await weth.deployed();
   console.log("WETH deployed to: ", weth.address);
 
   const WBTC = await ethers.getContractFactory("TestERC20");
   const wbtc = await upgrades.deployProxy(WBTC, ["TestWBTC", "WBTC", 8], {
-      initializer: "__TestERC20_init",
+    initializer: "__TestERC20_init",
   });
   await wbtc.deployed();
   console.log("WBTC deployed to: ", wbtc.address);
@@ -138,7 +138,9 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
     "ClearingHouseConfig"
   );
   const clearingHouseConfig = await upgrades.deployProxy(
-    ClearingHouseConfig, [], { gasLimit: 3e7 }
+    ClearingHouseConfig,
+    [],
+    { gasLimit: 3e7 }
   );
   await clearingHouseConfig.deployed();
   console.log("ClearingHouseConfig deployed to:", clearingHouseConfig.address);
