@@ -147,7 +147,8 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     function getIndexPrice(uint256 interval) public view override returns (uint256) {
         if (_status == IBaseToken.Status.Open) {
             return _formatDecimals(
-                uint256(_fortTfi.getTfiValue()).div(100).add(10**(_priceFeedDecimals))
+                uint256(_fortTfi.getTfiValue())
+                //.div(100).add(10**(_priceFeedDecimals))
                 );
         }
 
@@ -159,6 +160,7 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     //
 
     function _formatDecimals(uint256 _price) internal view returns (uint256) {
-        return _price.mul(10**(decimals().sub(_priceFeedDecimals)));
+        return _price;
+        //.mul(10**(decimals().sub(_priceFeedDecimals)))
     }
 }
