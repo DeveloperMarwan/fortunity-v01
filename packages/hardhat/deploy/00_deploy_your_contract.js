@@ -184,8 +184,11 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
     console.log(
         "finished setting the account balance address on the exchange contract"
     );
+    //await exchange.setMaxTickCrossedWithinBlock(baseToken.address, 1000);
+    //console.log("set MaxTickCrossedWithinBlock mapping");
+
     await orderBook.setExchange(exchange.address);
-    console.log("finished setting the exchange adress on the orderBook contract");
+    console.log("finished setting the exchange address on the orderBook contract");
 
     const InsuranceFund = await ethers.getContractFactory("InsuranceFund");
     const insuranceFund = await upgrades.deployProxy(InsuranceFund, [
