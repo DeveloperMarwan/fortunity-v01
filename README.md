@@ -18,7 +18,7 @@ git clone https://github.com/DeveloperMarwan/hardhat-starter-kit
 
 > install and start your 👷‍ Hardhat chain:
 
-> 1st Terminal Window:
+# 1st Terminal Window:
 Setup the Fortunity contracts https://github.com/DeveloperMarwan/fortunity-v01.git
 
 ```bash
@@ -27,7 +27,7 @@ yarn install
 yarn chain
 ```
 
-> 2nd Terminal WIndow:
+# 2nd Terminal Window:
  Setup the Chainlink hardhat starter kit @ https://github.com/DeveloperMarwan/hardhat-starter-kit
 
 ```bash
@@ -36,7 +36,7 @@ yarn deploy
 ```
 - reference the repository for additional options
 
-You will need the following contract addresses after deployment is done:  
+You will need the following contract addresses after deployment is done in the 3rd terminal window:
 1. WETH mock aggregator
 2. WBTC mock aggregator
 3. BaseToken VMATIC mock aggregator
@@ -47,26 +47,31 @@ You will need the following contract addresses after deployment is done:
 
 Now comes the hard part. Lots of copy pasting ahead. <b>Prepare yourself!</b>
 
+# 3rd Terminal Window:
+
+Open another terminal window for https://github.com/DeveloperMarwan/fortunity-v01.git
+
 In the fortunity-v01 directory, follow this directory path to open the 00_deploy_your_contract.js 
 packages/hardhat/deploy/00_deploy_your_contract.js
 
 <p align="center"><img src="./images/firstimage.png"></p>
 
-Change the values to match 
+Change the addresses to match the output of the second terminal window.
 
-> in a third terminal window, 🛰 deploy your fortunity-v01 contracts.  
-> before deploying the contracts, navigate to the deployment script at /packages/hardhat/deploy/00_deploy_your_contract.js and update the follwoing values:  
-> 1. weth_priceFeedAddress
-> 2. wbtc_priceFeedAddress
-> 3. vMATICpriceFeedAddress
-> 4. linkTokenAddress
-> 5. truflationJobId
-> 6. truflationFee
-> 7. truflationConsumerAddress
-> 8. traderWalletAddress (This should be the address of the wallet that will interact with the dApp)
+Update the following values:  
+1. weth_priceFeedAddress
+2. wbtc_priceFeedAddres
+3. vMATICpriceFeedAddress
+4. linkTokenAddress
+5. truflationJobId
+6. truflationFee
+7. truflationConsumerAddress
+8. traderWalletAddress (This should be the address of the wallet that will interact with the dApp)
+
+> 🛰 Deploy your fortunity-v01 contracts.
 
 ```bash
-cd fortunity-v01
+yarn install
 yarn deploy
 ```
 
