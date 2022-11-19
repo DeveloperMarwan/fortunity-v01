@@ -752,7 +752,7 @@ contract ClearingHouse is
 
         address insuranceFund = _insuranceFund;
 
-        // if there is bad debt, liquidation fees all go to liquidator; otherwise, split between liquidator & IF
+        // if there is bad debt, liquidation fees all go to liquidator; otherwise, it between liquidator & IF
         uint256 liquidationFeeToLiquidator = liquidationPenalty.div(2);
         uint256 liquidationFeeToIF;
         if (accountValue < 0) {
