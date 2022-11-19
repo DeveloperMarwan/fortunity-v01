@@ -45,12 +45,14 @@ You will need the following contract addresses after deployment is done:
 6. Truflation Job Id:
 7. TruflationConsumer address
 
-<b>Now comes the hard part. Lots of copy pasting ahead. Prepare yourself!</b>
+Now comes the hard part. Lots of copy pasting ahead. <b>Prepare yourself!</b>
 
 In the fortunity-v01 directory, follow this directory path to open the 00_deploy_your_contract.js 
 packages/hardhat/deploy/00_deploy_your_contract.js
 
+<p align="center"><img src="./images/firstimage.png"></p>
 
+Change the values to match 
 
 > in a third terminal window, 🛰 deploy your fortunity-v01 contracts.  
 > before deploying the contracts, navigate to the deployment script at /packages/hardhat/deploy/00_deploy_your_contract.js and update the follwoing values:  
