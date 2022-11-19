@@ -1,13 +1,3 @@
-// deploy/00_deploy_your_contract.js
-
-// deploy the bytecode
-/*
-const { ethers, upgrades } = require("hardhat");
-const {
-  abi,
-  bytecode
-} = require("../artifacts/@uniswap/v3-core/contracts/UniswapV3Factory.sol/UniswapV3Factory.json");
-*/
 const { upgrades, ethers } = require("hardhat");
 const { parseEther, parseUnits } = require("ethers/lib/utils");
 const uniswapFactory = require("../artifacts/@uniswap/v3-core/contracts/UniswapV3Factory.sol/UniswapV3Factory.json");
@@ -15,30 +5,22 @@ const { encodePriceSqrt } = require("../scripts/utilities");
 
 const localChainId = "31337";
 
-// const sleep = (ms) =>
-//   new Promise((r) =>
-//     setTimeout(() => {
-//       console.log(`waited for ${(ms / 1000).toFixed(3)} seconds`);
-//       r();
-//     }, ms)
-//   );
-
 module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
   const uniFeeTier = 10000; // 1%
 
-  const wethPriceFeedAddress = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
-  const wbtcPriceFeedAddress = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
-  const vMATICpriceFeedAddress = "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318";
+  const wethPriceFeedAddress = "0x851356ae760d987E095750cCeb3bC6014560891C";
+  const wbtcPriceFeedAddress = "0xf5059a5D33d5853360D16C683c16e67980206f36";
+  const vMATICpriceFeedAddress = "0x95401dc811bb5740090279Ba06cfA8fcF6113778";
   // const truflationOracleAddress = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690";
-  const linkTokenAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+  const linkTokenAddress = "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E";
   const truflationJobId = "2e1bcb542b9d127789985dfd01653be7";
   const truflationFee = ethers.utils.parseEther("0.1"); // 100000000000000000
   const truflationConsumerAddress =
-    "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
-  const traderWalletAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"; // TESTING ONLY!!!
+    "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB";
+  const traderWalletAddress = "0xe533a62026fd9F3F362c7506f7f2Bd5332e37BBa"; // TESTING ONLY!!!
 
   const cacheTwapInterval = 15 * 60;
 
@@ -69,13 +51,15 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     "MATICUSDChainlinkPriceFeedV2 deployed to: ",
     MATICUSDChainlinkPriceFeedV2.address
   );
-
+  console.log("baseToekn 1");
   const BaseToken = await ethers.getContractFactory("BaseToken");
+  console.log("baseToekn 2");
   const baseToken = await upgrades.deployProxy(BaseToken, [
     "vMATIC",
     "vMATIC",
     MATICUSDChainlinkPriceFeedV2.address,
   ]);
+  console.log("baseToekn 3");
   await baseToken.deployed();
   console.log("BaseToken vMATIC deployed to: ", baseToken.address);
   await baseToken.setTfiContract(fortTfi.address);
@@ -98,7 +82,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   const USDC = await ethers.getContractFactory("TestERC20");
   const usdc = await upgrades.deployProxy(USDC, ["TestUSDC", "USDC", 6], {
-      initializer: "__TestERC20_init",
+    initializer: "__TestERC20_init",
   });
   await usdc.deployed();
   console.log("USDC deployed to: ", usdc.address);
