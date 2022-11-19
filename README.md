@@ -5,12 +5,21 @@
 Prerequisites: [Node (v16 LTS)](https://nodejs.org/en/download/) plus [Yarn (v1.x)](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
 
 > clone/fork 🏗 fortunity-v01:
-
+In different directories,
 ```bash
 git clone https://github.com/DeveloperMarwan/fortunity-v01.git
 ```
+```bash
+git clone https://github.com/KevinPatel04/ChainLink
+```
+```bash
+git clone https://github.com/DeveloperMarwan/hardhat-starter-kit
+```
 
 > install and start your 👷‍ Hardhat chain:
+
+> 1st Terminal Window:
+Setup the Fortunity contracts https://github.com/DeveloperMarwan/fortunity-v01.git
 
 ```bash
 cd fortunity-v01
@@ -18,12 +27,30 @@ yarn install
 yarn chain
 ```
 
-> in a second terminal window, setup the Chainlink hardhat starter kit. You will need the following contract addresses after deployment is done:  
+> 2nd Terminal WIndow:
+ Setup the Chainlink hardhat starter kit @ https://github.com/DeveloperMarwan/hardhat-starter-kit
+
+```bash
+yarn install
+yarn deploy
+```
+- reference the repository for additional options
+
+You will need the following contract addresses after deployment is done:  
 1. WETH mock aggregator
 2. WBTC mock aggregator
-3. BaseToken mock aggregator
+3. BaseToken VMATIC mock aggregator
+4. LINK token address
+5. Truflation Oracle address
+6. Truflation Job Id:
+7. TruflationConsumer address
 
-Navigate to https://github.com/DeveloperMarwan/hardhat-starter-kit and follow the instructions there. Please make sure that you use a different folder than the current fortunity-v01 folder.  
+<b>Now comes the hard part. Lots of copy pasting ahead. Prepare yourself!</b>
+
+In the fortunity-v01 directory, follow this directory path to open the 00_deploy_your_contract.js 
+packages/hardhat/deploy/00_deploy_your_contract.js
+
+
 
 > in a third terminal window, 🛰 deploy your fortunity-v01 contracts.  
 > before deploying the contracts, navigate to the deployment script at /packages/hardhat/deploy/00_deploy_your_contract.js and update the follwoing values:  
