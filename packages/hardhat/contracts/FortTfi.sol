@@ -15,11 +15,10 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
     using Chainlink for Chainlink.Request;
     using SafeMathUpgradeable for uint256;
 
-    bytes public result;
-    bytes32 internal requestId;
-    mapping(bytes32 => bytes) public results;
-    uint256 public lastTfiUpdatedBlock;
-    uint256 public tfiUpdateInterval = 1 days;
+    int256 public latestValue;
+
+    uint256 public lastUpdatedBlock;
+    uint256 public updateInterval = 2 days;
     address public oracleId;
     string public jobId;
     uint256 public fee;
@@ -55,49 +54,13 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
             '{"location":"us}',
             "yearOverYearInflation", 
             "int256", 
-            "1000000000000000"
+            "10000000000000000" //16 0s because 1 + CPI/100
         );            
     }
-    
-    /*
-    function initialize(
-        address oracleId_,
-        string memory jobId_,
-        uint256 fee_,
-        address token_
-        //changed from initilizer ConfirmedOwner
-    ) public onlyOwner {
-        setChainlinkToken(token_);
-        oracleId = oracleId_;
-        jobId = jobId_;
-        fee = fee_;
-        TfiRequest = RequestData(
-            "truflation/current", 
-            "yearOverYearInflation", 
-            "int256", 
-            "2", 
-            '{"location":"us"}'
-        );
-    }
-    */
 
     //
     // PUBLIC NON-VIEW
     //
-    
-    function doRequest(
-        RequestData memory request
-        ) public returns (bytes32 requestId) {
-          Chainlink.Request memory req = buildChainlinkRequest(
-            bytesToBytes32(bytes(jobId)),
-            address(this), this.fulfillBytes.selector);
-        req.add("service", request._service);
-        req.add("data", request._data);
-        req.add("keypath", request._keypath);
-        req.add("abi", request._abi);
-        req.add("multiplier", request._multiplier);
-        return sendChainlinkRequestTo(oracleId, req, fee);
-    }
 
     function doTransferAndRequest(
         RequestData memory request,
@@ -120,14 +83,12 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
 
     function fulfillBytes(bytes32 _requestId, bytes memory bytesData)
         public recordChainlinkFulfillment(_requestId) {
-        result = bytesData;
-        results[_requestId] = bytesData;
-        requestId = _requestId;
-        lastTfiUpdatedBlock = block.timestamp;
+        latestValue = toInt256(bytesData);
+        lastUpdatedBlock = block.timestamp;
     }
 
     function updateTfiValue() public {
-        if (block.timestamp >= lastTfiUpdatedBlock.add(tfiUpdateInterval)) {
+        if (block.timestamp >= lastUpdatedBlock.add(updateInterval)) {
             doTransferAndRequest(TfiRequest, fee);
         }
     }
@@ -161,8 +122,8 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         setChainlinkToken(_address);
     }
 
-    function changeTfiUpdateInterval(uint256 _interval) public onlyOwner {
-        tfiUpdateInterval = _interval;
+    function changeUpdateInterval(uint256 _interval) public onlyOwner {
+        updateInterval = _interval;
     }
 
     function changeService(string memory service_) public onlyOwner {
@@ -193,12 +154,8 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         return chainlinkTokenAddress();
     }
 
-    function getInt256(bytes32 _requestId) public view returns (int256) {
-       return toInt256(results[_requestId]);
-    }
-
     function getTfiValue() public view returns (int256) {
-        return getInt256(requestId);
+        return latestValue;
     }
 
     //
@@ -223,9 +180,9 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         }
     }
 
-    // External - ONLY FOR TESTING, Get rid of b4 deployment
-    function setTfiValue(bytes32 id, bytes memory value) external {
-        requestId = id;
-        results[id] = value;
+    // External - ONLY FOR TESTING, Get rid of b4 deployment. Mimics fulfillBytes
+    function setTfiValue(bytes32 id, bytes memory bytesData) external {
+        latestValue = toInt256(bytesData);
+        lastUpdatedBlock = block.timestamp;
     }
 }
