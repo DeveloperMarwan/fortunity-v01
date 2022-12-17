@@ -52,10 +52,10 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         fee = fee_;
         TfiRequest = RequestData(
             "truflation/current", 
+            '{"location":"us}',
             "yearOverYearInflation", 
             "int256", 
-            "2", 
-            '{"location":"us"}'
+            "1000000000000000"
         );            
     }
     
@@ -133,10 +133,10 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
     }
 
     //A return function to Proxy
-    function returnTokensToProxy () public onlyOwner {
+    function returnAllTokensToProxy() public onlyOwner {
         //sends LINK
-        LinkTokenInterface(getToken()).transfer(msg.sender, 
-        LinkTokenInterface(getToken()).balanceOf(address(this)));
+        LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress());
+        require(link.transfer(msg.sender, link.balanceOf(address(this))));
         //sends ETH
         payable(msg.sender).transfer(address(this).balance);
     }

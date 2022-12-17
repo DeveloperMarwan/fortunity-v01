@@ -146,10 +146,10 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     ///      2. Paused or Closed: the price is twap when the token was paused
     function getIndexPrice(uint256 interval) public view override returns (uint256) {
         if (_status == IBaseToken.Status.Open) {
-            return _formatDecimals(
-                uint256(_fortTfi.getTfiValue())
+            return _formatDecimals(IPriceFeedV2(_priceFeed).getPrice(interval));
+
+                //uint256(_fortTfi.getTfiValue())
                 //.div(100).add(10**(_priceFeedDecimals))
-                );
         }
 
         return _pausedIndexPrice;
@@ -160,7 +160,6 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     //
 
     function _formatDecimals(uint256 _price) internal view returns (uint256) {
-        return _price;
-        //.mul(10**(decimals().sub(_priceFeedDecimals)))
+        return _price.mul(10**(decimals().sub(_priceFeedDecimals)));
     }
 }
