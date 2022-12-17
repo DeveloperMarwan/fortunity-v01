@@ -5,13 +5,14 @@ pragma abicoder v2;
 //need to update remappings to npm package for hardhat
 
 import { Strings } from "./lib/FortStrings.sol";
+import { IFortTfi } from "./interface/IFortTfi.sol";
 import { ChainlinkClient } from "@chainlink/contracts/src/v0.7/ChainlinkClient.sol";
 import { ConfirmedOwner } from "@chainlink/contracts/src/v0.7/dev/ConfirmedOwner.sol";
 import { Chainlink } from "@chainlink/contracts/src/v0.7/Chainlink.sol";
 import { LinkTokenInterface } from "@chainlink/contracts/src/v0.7/interfaces/LinkTokenInterface.sol";
 import { SafeMathUpgradeable } from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 
-contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
+contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender), IFortTfi {
     using Chainlink for Chainlink.Request;
     using SafeMathUpgradeable for uint256;
 
@@ -40,6 +41,7 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
     // INTERNAL NON-VIEW
     //
 
+    /// @dev Write this as initalize/initalizer to make it upgradable
     constructor(        
             address oracleId_,
             string memory jobId_,
@@ -87,7 +89,7 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         lastUpdatedBlock = block.timestamp;
     }
 
-    function updateTfiValue() public {
+    function updateTfiValue() external override {
         if (block.timestamp >= lastUpdatedBlock.add(updateInterval)) {
             doTransferAndRequest(TfiRequest, fee);
         }
@@ -154,7 +156,7 @@ contract FortTfi is ChainlinkClient, ConfirmedOwner(msg.sender) {
         return chainlinkTokenAddress();
     }
 
-    function getTfiValue() public view returns (int256) {
+    function getTfiValue() external view override returns (int256) {
         return latestValue;
     }
 
