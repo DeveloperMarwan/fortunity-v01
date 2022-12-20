@@ -28,6 +28,7 @@ import { ExchangeStorageV1 } from "./storage/ExchangeStorage.sol";
 import { IExchange } from "./interface/IExchange.sol";
 import { OpenOrder } from "./lib/OpenOrder.sol";
 import { IFortEventManager } from "./interface/IFortEventManager.sol";
+import { IFortTfi } from "./interface/IFortTfi.sol";
 
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
 contract Exchange is
@@ -80,6 +81,9 @@ contract Exchange is
         int256 quote;
     }
 
+    // Gets Tfi Data
+    address _fortTfi;
+
     //
     // CONSTANT
     //
@@ -95,7 +99,8 @@ contract Exchange is
     function initialize(
         address marketRegistryArg,
         address orderBookArg,
-        address clearingHouseConfigArg
+        address clearingHouseConfigArg,
+        address fortTfiArg
     ) external initializer {
         __ClearingHouseCallee_init();
         __UniswapV3CallbackBridge_init(marketRegistryArg);
@@ -104,6 +109,9 @@ contract Exchange is
         require(orderBookArg.isContract(), "E_OBNC");
         // E_CHNC: CH is not contract
         require(clearingHouseConfigArg.isContract(), "E_CHNC");
+
+        // fetches Tfi data
+        _fortTfi = fortTfiArg;
 
         // update states
         _orderBook = orderBookArg;
@@ -347,8 +355,11 @@ contract Exchange is
     }
 
     /// @inheritdoc IExchange
+    /// @dev Compares marketPrice and indexPrice modified by Tfi
     function isOverPriceSpread(address baseToken) external view override returns (bool) {
-        uint256 markPrice = getSqrtMarkTwapX96(baseToken, 0).formatSqrtPriceX96ToPriceX96().formatX96ToX10_18();
+        //marketPrice = uniswapPrice + TFI/100
+        uint256 markPrice = getSqrtMarkTwapX96(baseToken, 0).formatSqrtPriceX96ToPriceX96().formatX96ToX10_18() + 
+            uint256(IFortTfi(_fortTfi).getTfiValue());
         uint256 indexTwap =
             IIndexPrice(baseToken).getIndexPrice(IClearingHouseConfig(_clearingHouseConfig).getTwapInterval());
         uint256 spread = markPrice > indexTwap ? markPrice.sub(indexTwap) : indexTwap.sub(markPrice);

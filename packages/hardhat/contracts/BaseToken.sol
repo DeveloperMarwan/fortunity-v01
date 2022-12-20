@@ -9,7 +9,7 @@ import { BaseTokenStorageV2 } from "./storage/BaseTokenStorage.sol";
 import { IBaseToken } from "./interface/IBaseToken.sol";
 import { BlockContext } from "./base/BlockContext.sol";
 import { IFortEventManager } from "./interface/IFortEventManager.sol";
-import { FortTfi } from "./FortTfi.sol";
+import { IFortTfi } from "./interface/IFortTfi.sol";
 
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
 contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseTokenStorageV2, IFortEventManager {
@@ -17,7 +17,7 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     using SafeMathUpgradeable for uint8;
 
     // Added for FortTfi
-    FortTfi private _fortTfi;
+    address private _fortTfi;
 
     //
     // CONSTANT
@@ -33,7 +33,8 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     function initialize(
         string memory nameArg,
         string memory symbolArg,
-        address priceFeedArg
+        address priceFeedArg,
+        address fortTfiArg
     ) external initializer {
         __VirtualToken_init(nameArg, symbolArg);
 
@@ -44,6 +45,7 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
 
         _priceFeed = priceFeedArg;
         _priceFeedDecimals = priceFeedDecimals;
+        _fortTfi = fortTfiArg;
     }
 
     function pause() external onlyOwner {
@@ -84,10 +86,6 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
 
     function cacheTwap(uint256 interval) external override {
         IPriceFeedV2(_priceFeed).cacheTwap(interval);
-    }
-
-    function setTfiContract(address fortTfi) external {
-        _fortTfi = FortTfi(fortTfi);
     }
 
     //
@@ -147,7 +145,7 @@ contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseT
     function getIndexPrice(uint256 interval) public view override returns (uint256) {
         if (_status == IBaseToken.Status.Open) {
             /// @dev IndexPrice = PriceFeed + Inflation/100
-            return _formatDecimals(IPriceFeedV2(_priceFeed).getPrice(interval)).add(uint256(_fortTfi.getTfiValue()));
+            return _formatDecimals(IPriceFeedV2(_priceFeed).getPrice(interval)).add(uint256(IFortTfi(_fortTfi).getTfiValue()));
         }
 
         return _pausedIndexPrice;

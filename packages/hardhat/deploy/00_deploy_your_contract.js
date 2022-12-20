@@ -58,6 +58,7 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
         "vMATIC",
         "vMATIC",
         MATICUSDChainlinkPriceFeedV2.address,
+        fortTfi.address,
     ]);
     console.log("baseToekn 3");
     await baseToken.deployed();
@@ -165,6 +166,7 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
         marketRegistry.address,
         orderBook.address,
         clearingHouseConfig.address,
+        fortTfi.address,
     ]);
     await exchange.deployed();
     console.log("Exchange deployed to: ", exchange.address);
@@ -173,7 +175,7 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
         "finished setting the account balance address on the exchange contract"
     );
     await orderBook.setExchange(exchange.address);
-    console.log("finished setting the exchange adress on the orderBook contract");
+    console.log("finished setting the exchange address on the orderBook contract");
 
     const InsuranceFund = await ethers.getContractFactory("InsuranceFund");
     const insuranceFund = await upgrades.deployProxy(InsuranceFund, [
