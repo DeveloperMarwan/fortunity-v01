@@ -51,6 +51,8 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
         "MATICUSDChainlinkPriceFeedV2 deployed to: ",
         MATICUSDChainlinkPriceFeedV2.address
     );
+    await MATICUSDChainlinkPriceFeedV2.update();
+    console.log("MATICUSDChainlinkPriceFeedV2 update() called");
     console.log("baseToekn 1");
     const BaseToken = await ethers.getContractFactory("BaseToken");
     console.log("baseToekn 2");
