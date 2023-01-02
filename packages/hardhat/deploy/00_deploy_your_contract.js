@@ -53,6 +53,10 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
     );
     await MATICUSDChainlinkPriceFeedV2.update();
     console.log("MATICUSDChainlinkPriceFeedV2 update() called");
+    if (MATICUSDChainlinkPriceFeedV2.getPrice(900) == 0 || MATICUSDChainlinkPriceFeedV2.getPrice(900) == null) {
+        console.log("Update called but at 15min interval, no price data returned");
+    }
+    console.log("Current MATICUSD price at 15min interval: ", MATICUSDChainlinkPriceFeedV2.getPrice(900));
     console.log("baseToekn 1");
     const BaseToken = await ethers.getContractFactory("BaseToken");
     console.log("baseToekn 2");
@@ -65,8 +69,6 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
     console.log("baseToekn 3");
     await baseToken.deployed();
     console.log("BaseToken vMATIC deployed to: ", baseToken.address);
-    await baseToken.setTfiContract(fortTfi.address);
-    console.log("BaseToken.setTfiContract called");
 
     let QuoteToken = await ethers.getContractFactory("QuoteToken");
     let quoteToken = await upgrades.deployProxy(QuoteToken, ["vUSD", "vUSD"]);
