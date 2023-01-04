@@ -51,12 +51,11 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
         "MATICUSDChainlinkPriceFeedV2 deployed to: ",
         MATICUSDChainlinkPriceFeedV2.address
     );
-    await MATICUSDChainlinkPriceFeedV2.update();
-    console.log("MATICUSDChainlinkPriceFeedV2 update() called");
-    if (MATICUSDChainlinkPriceFeedV2.getPrice(900) == 0 || MATICUSDChainlinkPriceFeedV2.getPrice(900) == null) {
-        console.log("Update called but at 15min interval, no price data returned");
-    }
-    console.log("Current MATICUSD price at 15min interval: ", MATICUSDChainlinkPriceFeedV2.getPrice(900));
+    //await MATICUSDChainlinkPriceFeedV2.update();
+    //console.log("MATICUSDChainlinkPriceFeedV2 update() called");
+
+    //var thePrice = await MATICUSDChainlinkPriceFeedV2.getPrice(0);
+    //console.log("Current MATICUSD price at 0min interval: ", thePrice);
     console.log("baseToekn 1");
     const BaseToken = await ethers.getContractFactory("BaseToken");
     console.log("baseToekn 2");
