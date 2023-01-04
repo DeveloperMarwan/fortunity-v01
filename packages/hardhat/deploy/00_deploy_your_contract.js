@@ -37,6 +37,12 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
     const fortTfi = await ethers.getContract("FortTfi", deployer);
     console.log("FortTfi deployed to: ", fortTfi.address);
 
+    // Not sure why this is not formatted correctly
+    //await fortTfi.setTfiValue(0x0000000000000000000000000000000000000000000000000000000000000000,
+    // 0x000000000000000000000000000000000000000000000000ff);
+    //const temp = await fortTfi.getTfiValue();
+    //console.log("set Tfi value to: ", temp);
+
     await deploy("MATICUSDChainlinkPriceFeedV2", {
         from: deployer,
         contract: "ChainlinkPriceFeedV2",
