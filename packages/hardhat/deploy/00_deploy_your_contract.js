@@ -37,7 +37,7 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
     const fortTfi = await ethers.getContract("FortTfi", deployer);
     console.log("FortTfi deployed to: ", fortTfi.address);
 
-    // Not sure why this is not formatted correctly
+    // need to format 0x64 0s to a bytes32[] in JS b4 passing in
     //await fortTfi.setTfiValue(0x0000000000000000000000000000000000000000000000000000000000000000,
     // 0x000000000000000000000000000000000000000000000000ff);
     //const temp = await fortTfi.getTfiValue();
