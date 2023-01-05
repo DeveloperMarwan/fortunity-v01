@@ -38,10 +38,11 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
     console.log("FortTfi deployed to: ", fortTfi.address);
 
     // need to format 0x64 0s to a bytes32[] in JS b4 passing in
-    //await fortTfi.setTfiValue(0x0000000000000000000000000000000000000000000000000000000000000000,
-    // 0x000000000000000000000000000000000000000000000000ff);
-    //const temp = await fortTfi.getTfiValue();
-    //console.log("set Tfi value to: ", temp);
+    const amount = ethers.BigNumber.from(0);
+    const amount2 = ethers.BigNumber.from(10);
+    await fortTfi.setTfiValue(ethers.utils.hexZeroPad(amount, 32),
+        ethers.utils.hexZeroPad(amount2, 32));
+    console.log("Set Tfi data: ", amount2);
 
     await deploy("MATICUSDChainlinkPriceFeedV2", {
         from: deployer,
@@ -57,6 +58,9 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
         "MATICUSDChainlinkPriceFeedV2 deployed to: ",
         MATICUSDChainlinkPriceFeedV2.address
     );
+
+    setTimeout(await MATICUSDChainlinkPriceFeedV2.cacheTwap(ethers.BigNumber.from(900)), 1000);
+    console.log("Set observations[0] price with MaticUsdPriceFeedV2.cacheTwap");
     //await MATICUSDChainlinkPriceFeedV2.update();
     //console.log("MATICUSDChainlinkPriceFeedV2 update() called");
 
