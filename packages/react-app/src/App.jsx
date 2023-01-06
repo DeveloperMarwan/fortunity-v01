@@ -300,8 +300,20 @@ function App(props) {
         <Menu.Item key="/">
           <Link to="/">App Home</Link>
         </Menu.Item>
-        <Menu.Item key="/debug">
-          <Link to="/debug">ClearingHouse</Link>
+        <Menu.Item key="/ClearingHouse">
+          <Link to="/ClearingHouse">ClearingHouse</Link>
+        </Menu.Item>
+        <Menu.Item key="/Vault">
+          <Link to="/Vault">Vault</Link>
+        </Menu.Item>
+        <Menu.Item key="/USDC_ERC20">
+          <Link to="/USDC_ERC20">USDC_ERC20</Link>
+        </Menu.Item>
+        <Menu.Item key="/Exchange">
+          <Link to="/Exchange">Exchange</Link>
+        </Menu.Item>
+        <Menu.Item key="/FortTfi">
+          <Link to="/FortTfi">FortTfi</Link>
         </Menu.Item>
       </Menu>
 
@@ -310,15 +322,53 @@ function App(props) {
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
           <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
         </Route>
-        <Route exact path="/debug">
-          {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
+        <Route exact path="/ClearingHouse">
           <Contract
             name="ClearingHouse"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+        </Route>
+        <Route exact path="/Vault">
+          <Contract
+            name="Vault"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+        </Route>
+        <Route exact path="/USDC_ERC20">
+          <Contract
+            name="USDC_ERC20"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+        </Route>
+        <Route exact path="/Exchange">
+          <Contract
+            name="Exchange"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+        </Route>
+        <Route exact path="/FortTfi">
+          <Contract
+            name="FortTfi"
             price={price}
             signer={userSigner}
             provider={localProvider}

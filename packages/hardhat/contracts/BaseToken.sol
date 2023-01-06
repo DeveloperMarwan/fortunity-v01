@@ -10,6 +10,7 @@ import { IBaseToken } from "./interface/IBaseToken.sol";
 import { BlockContext } from "./base/BlockContext.sol";
 import { IFortEventManager } from "./interface/IFortEventManager.sol";
 import { IFortTfi } from "./interface/IFortTfi.sol";
+import "hardhat/console.sol";
 
 // never inherit any new stateful contract. never change the orders of parent stateful contracts
 contract BaseToken is IBaseToken, IIndexPrice, VirtualToken, BlockContext, BaseTokenStorageV2, IFortEventManager {
