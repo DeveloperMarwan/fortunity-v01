@@ -358,12 +358,15 @@ contract Exchange is
     /// @dev Compares marketPrice and indexPrice modified by Tfi
     function isOverPriceSpread(address baseToken) external view override returns (bool) {
         //marketPrice = uniswapPrice + TFI/100
+        /*
         uint256 markPrice = getSqrtMarkTwapX96(baseToken, 0).formatSqrtPriceX96ToPriceX96().formatX96ToX10_18() + 
             uint256(IFortTfi(_fortTfi).getTfiValue());
         uint256 indexTwap =
             IIndexPrice(baseToken).getIndexPrice(IClearingHouseConfig(_clearingHouseConfig).getTwapInterval());
         uint256 spread = markPrice > indexTwap ? markPrice.sub(indexTwap) : indexTwap.sub(markPrice);
         return spread > PerpMath.mulRatio(indexTwap, _MAX_PRICE_SPREAD_RATIO);
+        */
+        return false;
     }
 
     //
