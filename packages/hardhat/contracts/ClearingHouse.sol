@@ -303,15 +303,6 @@ contract ClearingHouse is
             response.fee
         );
 
-        emit ActivityChange(
-            IFortEventManager.Action.Stake,
-            _getTakerPositionSafe(trader, params.baseToken),
-            response.liquidity.toInt256(),
-            _getSqrtMarkX96(params.baseToken),
-            response.fee,
-            block.timestamp
-        );
-
         return
             AddLiquidityResponse({
                 base: response.base,

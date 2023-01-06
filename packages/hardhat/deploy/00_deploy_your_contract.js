@@ -7,7 +7,7 @@ const localChainId = "31337";
 
 module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
     const { deploy } = deployments;
-    const { deployer } = await getNamedAccounts();
+    const { deployer, wallet1 } = await getNamedAccounts();
     const chainId = await getChainId();
     const uniFeeTier = 10000; // 1%
 
@@ -59,8 +59,8 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
         MATICUSDChainlinkPriceFeedV2.address
     );
 
-    setTimeout(await MATICUSDChainlinkPriceFeedV2.cacheTwap(ethers.BigNumber.from(900)), 1000);
-    console.log("Set observations[0] price with MaticUsdPriceFeedV2.cacheTwap");
+    //setTimeout(await MATICUSDChainlinkPriceFeedV2.cacheTwap(ethers.BigNumber.from(900)), 1000);
+    //console.log("Set observations[0] price with MaticUsdPriceFeedV2.cacheTwap");
     //await MATICUSDChainlinkPriceFeedV2.update();
     //console.log("MATICUSDChainlinkPriceFeedV2 update() called");
 
@@ -103,6 +103,13 @@ module.exports = async({ getNamedAccounts, deployments, getChainId }) => {
     const usdcDecimals = await usdc.decimals();
     await usdc.mint(traderWalletAddress, ethers.utils.parseEther("1000000"));
     console.log("Minted 1M USDC to trader wallet....WooHoo we are rich!!");
+
+    //await MATICUSDChainlinkPriceFeedV2.update();
+    //await usdc.mint(wallet1, ethers.utils.parseEther("1"));
+
+    //await MATICUSDChainlinkPriceFeedV2.cacheTwap(ethers.BigNumber.from(900));
+    //console.log("Set observations[0] price with MaticUsdPriceFeedV2.cacheTwap");
+
 
     const WETH = await ethers.getContractFactory("TestERC20");
     const weth = await upgrades.deployProxy(WETH, ["TestWETH", "WETH", 18], {
