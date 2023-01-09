@@ -359,6 +359,8 @@ contract Exchange is
     function isOverPriceSpread(address baseToken) external view override returns (bool) {
         //marketPrice = uniswapPrice + TFI/100
         /*
+            Modifying to fit economic model
+
         uint256 markPrice = getSqrtMarkTwapX96(baseToken, 0).formatSqrtPriceX96ToPriceX96().formatX96ToX10_18() + 
             uint256(IFortTfi(_fortTfi).getTfiValue());
         uint256 indexTwap =
